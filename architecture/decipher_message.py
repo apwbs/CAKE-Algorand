@@ -93,3 +93,26 @@ def main(message_id, slice_id, reader_address):
                 saltdec = hyb_abe.decrypt(pk, sk, salt)
 
                 return mdec, saltdec
+    else:
+        print('nessun slice')
+        body = json.loads(j2['body'])
+
+        message = body[0][1]
+        message = base64.b64decode(message)
+        message = bytesToObject(message, groupObj)
+
+        salt = body[0][0][1]
+        salt = base64.b64decode(salt)
+        salt = bytesToObject(salt, groupObj)
+
+        x.execute(
+            "SELECT * FROM generated_key_reader WHERE process_instance_id=? AND message_id=? AND reader_address=?",
+            (process_instance_id, message_id, reader_address))
+        result = x.fetchall()
+        sk = result[0][4]
+        sk = bytesToObject(sk, groupObj)
+
+        mdec = hyb_abe.decrypt(pk, sk, message)
+        saltdec = hyb_abe.decrypt(pk, sk, salt)
+
+        return mdec, saltdec

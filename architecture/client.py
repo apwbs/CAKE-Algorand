@@ -64,11 +64,10 @@ def send(msg):
             x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?)",
                       (process_instance_id, message_id, slice_id, plaintext, salt))
             connection.commit()
-            print(plaintext)
 
 
-message_id = '9526055073375559011'
-slice_id = '1678196926691841096'
+message_id = '5388148990832263896'
+slice_id = '0'
 requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # msg = b'9139315610039915578'

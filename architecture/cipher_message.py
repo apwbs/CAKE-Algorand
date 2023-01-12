@@ -75,32 +75,40 @@ def main(message, entries, access_policy, sender):
     access_policy = access_policy.split('###')
 
     if len(access_policy) == 1:
+        message = json.dumps(json.loads(message))
         message_ciphered = hyb_abe.encrypt(pk, message, access_policy[0])
         message_ciphered_bytes = objectToBytes(message_ciphered, groupObj)
+        cipher_bytes_64 = base64.b64encode(message_ciphered_bytes).decode('ascii')
 
         now = datetime.now()
         now = int(now.strftime("%Y%m%d%H%M%S%f"))
         random.seed(now)
         message_id = random.randint(1, 2 ** 64)
+        print(f'message id: {message_id}')
+
         salt = random.randint(1, 2 ** 64)
         salt_to_encrypt = str(salt).encode()
         salt_with_policy = hyb_abe.encrypt(pk, salt_to_encrypt, access_policy[0])
         salt_with_policy_bytes = objectToBytes(salt_with_policy, groupObj)
+        salt_with_policy_bytes_64 = base64.b64encode(salt_with_policy_bytes).decode('ascii')
 
         s_1 = message + str(salt)
         s_1 = s_1.encode()
         s_1_hashed = hashlib.sha256(s_1)
         hex_dig = s_1_hashed.hexdigest()
 
-        header = {'sender': sender, 'message_id': message_id, 'pk': pk_bytes, 'mk': mk_bytes}
-        body = {'hash': hex_dig, 'salt': salt_with_policy_bytes, 'ciphertext': message_ciphered_bytes}
+        json_encoded_list = [hex_dig, salt_with_policy_bytes_64]
+        final_messages_parts = [(json_encoded_list, cipher_bytes_64)]
+        json_encoded_list = json.dumps(final_messages_parts)
 
-        final_message = {'header': header, 'body': body}
+        header = {'sender': sender, 'message_id': message_id, 'pk': pk_bytes_64, 'mk': mk_bytes_encoded_64}
+
+        final_message = {'header': header, 'body': json_encoded_list}
 
         hash_file = api.add_json(final_message)
         print(f'ipfs hash: {hash_file}')
 
-        print(os.system('python3.11 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
+        print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file)))
 
     else:
