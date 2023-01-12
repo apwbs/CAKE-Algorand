@@ -39,7 +39,6 @@ def check_plaintext(process_instance_id, message_id, slice_id):
             hex_dig = combined_hashed.hexdigest()
 
             print(hex_dig == message_hex)
-            exit()
 
 
 if __name__ == "__main__":
