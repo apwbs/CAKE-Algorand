@@ -15,6 +15,7 @@ import encoders_decoders
 import rsa
 import ast
 import base64
+import sqlite3
 
 api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
@@ -23,7 +24,6 @@ app_id_pk_skm = config('APPLICATION_ID_PK_SKM')
 skm_address = config('SKM_ADDRESS')
 app_id_certifier = config('APPLICATION_ID_CERTIFIER')
 process_instance_id = config('PROCESS_INSTANCE_ID')
-
 
 """
 Necessary ABE connections
@@ -52,6 +52,10 @@ function that creates a key for the demanding client. The key is generated using
 
 
 def main(message_id, reader_address):
+    # Connection to SQLite3 skm database
+    conn = sqlite3.connect('files/skm/skm.db')
+    x = conn.cursor()
+
     global groupObj
     groupObj = PairingGroup('SS512')
     cpabe = CPabe_BSW07(groupObj)
@@ -82,4 +86,8 @@ def main(message_id, reader_address):
     sk = hyb_abe.keygen(pk, mk, user_attr)
     user_sk_bytes = objectToBytes(sk, groupObj)
 
-    return user_sk_bytes, msg_ipfs_link
+    x.execute("INSERT OR IGNORE INTO generated_key_reader VALUES (?,?,?)",
+              (str(process_instance_id), reader_address, user_sk_bytes))
+    conn.commit()
+
+    return user_sk_bytes, msg_ipfs_link[0]

@@ -16,6 +16,7 @@ import base64
 # import SC_retrieve_link
 
 app_id_messages = config('APPLICATION_ID_MESSAGES')
+process_instance_id = config('PROCESS_INSTANCE_ID')
 
 
 """
@@ -47,7 +48,11 @@ class HybridABEnc(ABEnc):
 """
 
 
-def main(message_id, reader_address):
+def main(message_id, slice_id, reader_address):
+    # Connection to SQLite3 skm database
+    conn = sqlite3.connect('files/skm/skm.db')
+    x = conn.cursor()
+
     api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
     global groupObj
     groupObj = PairingGroup('SS512')
@@ -63,7 +68,31 @@ def main(message_id, reader_address):
     pk = base64.b64decode(pk)
     pk = bytesToObject(pk, groupObj)
 
-    body = json.loads(j2['body'])
+    if int(slice_id) != 0:
+        print('tanti slice')
+        body = json.loads(j2['body'])
+        for i, elem in enumerate(body):
+            slice_number = body[i][0][0][0]
+            if slice_number == int(slice_id):
+                print(slice_number)
+                message = body[i][1]
+                message = base64.b64decode(message)
+                message = bytesToObject(message, groupObj)
+
+                x.execute("SELECT * FROM generated_key_reader WHERE process_instance_id=? AND reader_address=?",
+                          (process_instance_id, reader_address))
+                result = x.fetchall()
+                sk = result[0][2]
+                sk = bytesToObject(sk, groupObj)
+
+                mdec = hyb_abe.decrypt(pk, sk, message)
+                print(mdec)
+
+                return mdec
+
+    # body = json.loads(j2['body'])
+    # print(len(body))
+    # exit()
 
     # salt = body[1][0][0][2]
     # salt = base64.b64decode(salt)
@@ -71,15 +100,15 @@ def main(message_id, reader_address):
     # print(salt)
     # exit()
 
-    message = body[1][1]
-    message = base64.b64decode(message)
-    message = bytesToObject(message, groupObj)
+    # message = body[1][1]
+    # message = base64.b64decode(message)
+    # message = bytesToObject(message, groupObj)
     # print(type(message))
     # exit()
 
-    sk = b'eJylVj1PXDEQ/Cunq6+w/fyxpg0USChBkFQROpGIJqKIciRShPjv8ezOvmehNIji7t492+vdmdmxn/fn+7Pd8/54/P54fzodj+Pf/tvfp4fT/rAbb//cP/5+0LdfSzjsihx2rY7f5bCLsR92WfDQxleIeBrv28LxUPGlE8phV8dshIgBs+OYXcZHGlfhQcbcOj4yFkriOn1I+s+Hmn0aImJ9ikyiY7OQ8Q87xfHUGpNEiLwwUQmeGma3gocRrY2hFrixLrfasLZWjw8cxlDvXKXDJbIqASrdMsU0yx1YoHod8RcIib2BFgrBr2SmWIrFULyqIjyGK5CMdy+DnPMfylysIee0hJCCjCklxfBWRmNIhEMi92nrztWoAyz66yVpwomzDJiFDAN81KLFAv9m66AMKcRJieEEQGlYBUPE8iiGpiKutASu0yEbd9g8QhSCi9gxAuFkymrBp3RLRblVJl2/mKJbR+ocbBRKtVIgqMBYWqzwVwptzm53zrppVWEGZNhiIvL2y/X11eXFzZtpUxgrC2nyuiOwXQ9MIkZP0HpzMVD0tVUTGNGmq7BBLeIhChpTaY6Vw9lb24KsqnGSQGb21kZmMytbhOBJW4aeBmpBPJCjpjCLR6ch7eZdhihK3UpElq2joD4gD+gaS0dPiSecmZ+RxqDYDqtUe2kVISklexdXFx8+33z6ePnh9q0Emsd5a6sKoU1sWWU1qNUlmVH2oeImpTnGTWhwN5nemS27LWIfJSuRiu4sbFallHE/iqmzGW1OYF802lqjlZrDZu5PD8BMZcOtFZk3tnpnSpgM2WBM261OegJP6oEmnWxvGn3XcCTNTZhyaVN92F5bjm1nBvrzvQ6q1YkbUqLT4AMxKUJswlqpcLc3908wrWcjDwHV+uwY3d3TTymEVjmqCvKy0aB1V74Ul3UhqQpRduPTcJGsuGoKWSuuoLS1WJ+aUKsSzk3cWPgH4gHOmc5uLsyzTrabgWtGePBgCMnrkZh5hNCBmrzbNjeuwupviS0nfU1oYQLeJX7ZYHJemBKgkAU/oTpHIo9NsyOeHibjhY2QZy+p3spxq1m7ohOPQGzz6gk8Gb3RjdTsBt3dP5zJ6IujIZlnsxTeZZqv9XtZ8buZXal0cXLndjdejw09Zv3Wtd62miP8Psd07hBFKBnkrMdb9AulOAy8jBIQPXeW6ZyWuqlXbYb3RBMq/Sg7JCbWMgG03hfsJpc3qrIfqZZBcPuU6MEyI2qbsx+EV2PhAdl40TMC6xRDZNNZK9M1uGyqVR2Lr7Szn0Xabbd6W4q9Xe/guiBS9O3VRUVbDlzsT0+/zv7nmWMChta+5P+Z7ruXf6wibQk='
-    sk = bytesToObject(sk, groupObj)
+    # sk = b'eJylVj1PXDEQ/Cunq6+w/fyxpg0USChBkFQROpGIJqKIciRShPjv8ezOvmehNIji7t492+vdmdmxn/fn+7Pd8/54/P54fzodj+Pf/tvfp4fT/rAbb//cP/5+0LdfSzjsihx2rY7f5bCLsR92WfDQxleIeBrv28LxUPGlE8phV8dshIgBs+OYXcZHGlfhQcbcOj4yFkriOn1I+s+Hmn0aImJ9ikyiY7OQ8Q87xfHUGpNEiLwwUQmeGma3gocRrY2hFrixLrfasLZWjw8cxlDvXKXDJbIqASrdMsU0yx1YoHod8RcIib2BFgrBr2SmWIrFULyqIjyGK5CMdy+DnPMfylysIee0hJCCjCklxfBWRmNIhEMi92nrztWoAyz66yVpwomzDJiFDAN81KLFAv9m66AMKcRJieEEQGlYBUPE8iiGpiKutASu0yEbd9g8QhSCi9gxAuFkymrBp3RLRblVJl2/mKJbR+ocbBRKtVIgqMBYWqzwVwptzm53zrppVWEGZNhiIvL2y/X11eXFzZtpUxgrC2nyuiOwXQ9MIkZP0HpzMVD0tVUTGNGmq7BBLeIhChpTaY6Vw9lb24KsqnGSQGb21kZmMytbhOBJW4aeBmpBPJCjpjCLR6ch7eZdhihK3UpElq2joD4gD+gaS0dPiSecmZ+RxqDYDqtUe2kVISklexdXFx8+33z6ePnh9q0Emsd5a6sKoU1sWWU1qNUlmVH2oeImpTnGTWhwN5nemS27LWIfJSuRiu4sbFallHE/iqmzGW1OYF802lqjlZrDZu5PD8BMZcOtFZk3tnpnSpgM2WBM261OegJP6oEmnWxvGn3XcCTNTZhyaVN92F5bjm1nBvrzvQ6q1YkbUqLT4AMxKUJswlqpcLc3908wrWcjDwHV+uwY3d3TTymEVjmqCvKy0aB1V74Ul3UhqQpRduPTcJGsuGoKWSuuoLS1WJ+aUKsSzk3cWPgH4gHOmc5uLsyzTrabgWtGePBgCMnrkZh5hNCBmrzbNjeuwupviS0nfU1oYQLeJX7ZYHJemBKgkAU/oTpHIo9NsyOeHibjhY2QZy+p3spxq1m7ohOPQGzz6gk8Gb3RjdTsBt3dP5zJ6IujIZlnsxTeZZqv9XtZ8buZXal0cXLndjdejw09Zv3Wtd62miP8Psd07hBFKBnkrMdb9AulOAy8jBIQPXeW6ZyWuqlXbYb3RBMq/Sg7JCbWMgG03hfsJpc3qrIfqZZBcPuU6MEyI2qbsx+EV2PhAdl40TMC6xRDZNNZK9M1uGyqVR2Lr7Szn0Xabbd6W4q9Xe/guiBS9O3VRUVbDlzsT0+/zv7nmWMChta+5P+Z7ruXf6wibQk='
+    # sk = bytesToObject(sk, groupObj)
 
-    mdec = hyb_abe.decrypt(pk, sk, message)
-    print(mdec)
-    exit()
+    # mdec = hyb_abe.decrypt(pk, sk, message)
+    # print(mdec)
+    # exit()

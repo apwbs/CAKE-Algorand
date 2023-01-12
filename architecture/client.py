@@ -52,16 +52,19 @@ def send(msg):
     if len(receive) != 0:
         if receive[:25] == 'Here is IPFS link and key':
             key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
-            # print(type(key.encode()))
-            # exit()
+            ipfs_link = receive.split('\n\n')[1]
+
             x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?)",
                       (process_instance_id, key))
             connection.commit()
-    # with open("key_" + requester + "--messageid_" + message_id + ".txt", "w") as text_file:
-    #     text_file.write(json.dumps(receive[79:]))
+
+            x.execute("INSERT OR IGNORE INTO ipfs_links VALUES (?,?,?)",
+                      (process_instance_id, message_id, ipfs_link))
+            connection.commit()
 
 
-message_id = '903116761736756067'
+message_id = '16652155676795677730'
+slice_id = '4021432370870130746'
 requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # msg = b'9139315610039915578'
@@ -75,7 +78,7 @@ requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # send("Generate my key||" + message_id + '||' + requester)
 
-send("Access my data||" + message_id + '||' + requester)
+send("Access my data||" + message_id + '||' + slice_id + '||' + requester)
 
 # exit()
 

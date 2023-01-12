@@ -10,3 +10,10 @@ CREATE TABLE rsa_private_key (
     privateKey TEXT,
     primary key (reader_address)
 );
+
+CREATE TABLE generated_key_reader (
+    process_instance_id TEXT,
+    reader_address TEXT,
+    secret_key TEXT,
+    primary key (process_instance_id, reader_address)
+);

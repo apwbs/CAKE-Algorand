@@ -75,4 +75,4 @@ sender = manufacturer_address
 
 send("Cipher this message||" + message_to_send + '||' + entries_string + '||' + policy_string + '||' + sender)
 
-# send(DISCONNECT_MESSAGE)
+send(DISCONNECT_MESSAGE)
