@@ -54,17 +54,21 @@ def send(msg):
             key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
             ipfs_link = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?)",
-                      (process_instance_id, key))
+            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?)",
+                      (process_instance_id, message_id, ipfs_link, key))
             connection.commit()
+        elif receive[:26] == 'Here is plaintext and salt':
+            plaintext = receive.split('\n\n')[0].split('Here is plaintext and salt: ')[1]
+            salt = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO ipfs_links VALUES (?,?,?)",
-                      (process_instance_id, message_id, ipfs_link))
+            x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?)",
+                      (process_instance_id, message_id, slice_id, plaintext, salt))
             connection.commit()
+            print(plaintext)
 
 
-message_id = '16652155676795677730'
-slice_id = '4021432370870130746'
+message_id = '9526055073375559011'
+slice_id = '1678196926691841096'
 requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # msg = b'9139315610039915578'

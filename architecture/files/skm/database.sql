@@ -13,7 +13,9 @@ CREATE TABLE rsa_private_key (
 
 CREATE TABLE generated_key_reader (
     process_instance_id TEXT,
+    message_id TEXT,
+    ipfs_message_link TEXT,
     reader_address TEXT,
     secret_key TEXT,
-    primary key (process_instance_id, reader_address)
+    primary key (process_instance_id, message_id)
 );

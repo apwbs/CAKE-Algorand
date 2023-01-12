@@ -86,8 +86,8 @@ def main(message_id, reader_address):
     sk = hyb_abe.keygen(pk, mk, user_attr)
     user_sk_bytes = objectToBytes(sk, groupObj)
 
-    x.execute("INSERT OR IGNORE INTO generated_key_reader VALUES (?,?,?)",
-              (str(process_instance_id), reader_address, user_sk_bytes))
+    x.execute("INSERT OR IGNORE INTO generated_key_reader VALUES (?,?,?,?,?)",
+              (str(process_instance_id), message_id, msg_ipfs_link[0], reader_address, user_sk_bytes))
     conn.commit()
 
     return user_sk_bytes, msg_ipfs_link[0]

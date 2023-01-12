@@ -67,7 +67,7 @@ def handle_client(conn, addr):
                 conn.send(b'Here is IPFS link and key: ' + response_0 + b'\n\n' + response_1)
             if message[0] == "Access my data":
                 response = read(message[1], message[2], message[3])
-                conn.send(b'Here is plaintext and salt:\n\n' + response[0] + b'\n\n' + response[1])
+                conn.send(b'Here is plaintext and salt: ' + response[0] + b'\n\n' + response[1])
 
     conn.close()
 

@@ -60,7 +60,6 @@ def handle_client(conn, addr):
             conn.send("Msg received!".encode(FORMAT))
             message = msg.split('||')
             if message[0] == "Cipher this message":
-                # json_message = json.loads(message[1])
                 message_id = cipher(message)
                 conn.send(b'Here is the message_id: ' + str(message_id).encode())
     conn.close()

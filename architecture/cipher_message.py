@@ -123,10 +123,10 @@ def main(message, entries, access_policy, sender):
             salt_message = []
 
             message_with_salt_hash = []
-            message_salt = ''
             for field in entry:
                 json_file_ciphered[field] = message_dict[field]
             json_file_ciphered_string = json.dumps(json_file_ciphered)
+            message_salt = json_file_ciphered_string
             cipher = hyb_abe.encrypt(pk, json_file_ciphered_string, access_policy[i])
             cipher_bytes = objectToBytes(cipher, groupObj)
             cipher_bytes_64 = base64.b64encode(cipher_bytes).decode('ascii')
