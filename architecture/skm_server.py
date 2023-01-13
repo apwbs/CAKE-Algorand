@@ -7,6 +7,14 @@ from datetime import datetime
 import random
 import sqlite3
 from hashlib import sha512
+import retriever
+from decouple import config
+import ipfshttpclient
+
+api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
+
+app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
+process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
 PORT = 5050
@@ -39,6 +47,44 @@ def read(message_id, slice_id, reader_address):
     return decipher_message.main(message_id, slice_id, reader_address)
 
 
+def generate_number_to_sign(message_id, reader_address):
+    # Connection to SQLite3 skm database
+    connection = sqlite3.connect('files/skm/skm.db')
+    x = connection.cursor()
+
+    now = datetime.now()
+    now = int(now.strftime("%Y%m%d%H%M%S%f"))
+    random.seed(now)
+    number_to_sign = random.randint(1, 2 ** 64)
+
+    x.execute("INSERT OR IGNORE INTO handshake_numbers VALUES (?,?,?,?)",
+              (str(process_instance_id), message_id, reader_address, str(number_to_sign)))
+    connection.commit()
+    return number_to_sign
+
+
+def check_handshake(message_id, reader_address, signature):
+    # Connection to SQLite3 skm database
+    connection = sqlite3.connect('files/skm/skm.db')
+    x = connection.cursor()
+
+    x.execute("SELECT * FROM handshake_numbers WHERE process_instance=?  AND message_id=? AND reader_address=?",
+              (str(process_instance_id), message_id, reader_address))
+    result = x.fetchall()
+    number_to_sign = result[0][3]
+    msg = str(number_to_sign).encode()
+    public_key_ipfs_link = retriever.retrieveReaderPublicKey(app_id_pk_readers, reader_address)
+    getfile = api.cat(public_key_ipfs_link)
+    getfile = getfile.split(b'###')
+    public_key_n = int(getfile[1].decode('utf-8'))
+    public_key_e = int(getfile[2].decode('utf-8').rstrip('"'))
+    if getfile[0].split(b': ')[1].decode('utf-8') == reader_address:
+        hash = int.from_bytes(sha512(msg).digest(), byteorder='big')
+        hashFromSignature = pow(int(signature), public_key_e, public_key_n)
+        print("Signature valid:", hash == hashFromSignature)
+        return hash == hashFromSignature
+
+
 """
 function that handles the requests from the clients. There are two possible requests, namely the 
 creation of a key and the deciphering of a ciphertext.
@@ -60,14 +106,19 @@ def handle_client(conn, addr):
             # print(f"[{addr}] {msg}")
             conn.send("Msg received!".encode(FORMAT))
             message = msg.split('||')
+            if message[0] == "Start handshake":
+                number_to_sign = generate_number_to_sign(message[1], message[2])
+                conn.send(b'number to sign: ' + str(number_to_sign).encode())
             if message[0] == "Generate my key":
-                response = generate(message[1], message[2])
-                response_0 = bytes(str(response[0]), FORMAT)
-                response_1 = bytes(str(response[1]), FORMAT)
-                conn.send(b'Here is IPFS link and key: ' + response_0 + b'\n\n' + response_1)
+                if check_handshake(message[1], message[2], message[3]):
+                    response = generate(message[1], message[2])
+                    response_0 = bytes(str(response[0]), FORMAT)
+                    response_1 = bytes(str(response[1]), FORMAT)
+                    conn.send(b'Here is IPFS link and key: ' + response_0 + b'\n\n' + response_1)
             if message[0] == "Access my data":
-                response = read(message[1], message[2], message[3])
-                conn.send(b'Here is plaintext and salt: ' + response[0] + b'\n\n' + response[1])
+                if check_handshake(message[1], message[3], message[4]):
+                    response = read(message[1], message[2], message[3])
+                    conn.send(b'Here is plaintext and salt: ' + response[0] + b'\n\n' + response[1])
 
     conn.close()
 

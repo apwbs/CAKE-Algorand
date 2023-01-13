@@ -36,6 +36,27 @@ conn = context.wrap_socket(s, server_side=False, server_hostname=server_sni_host
 conn.connect(ADDR)
 
 
+def sign_number(message_id):
+    x.execute("SELECT * FROM handshake_number WHERE process_instance=? AND message_id=?",
+              (process_instance_id, message_id))
+    result = x.fetchall()
+    number_to_sign = result[0][2]
+
+    x.execute("SELECT * FROM rsa_private_key WHERE reader_address=?", (reader_address,))
+    result = x.fetchall()
+    private_key = result[0]
+
+    private_key_n = int(private_key[1])
+    private_key_d = int(private_key[2])
+
+    msg = bytes(str(number_to_sign), 'utf-8')
+    hash = int.from_bytes(sha512(msg).digest(), byteorder='big')
+    signature = pow(hash, private_key_d, private_key_n)
+    # print("Signature:", hex(signature))
+    return signature
+
+
+
 """
 function to handle the sending and receiving messages.
 """
@@ -50,6 +71,12 @@ def send(msg):
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
     if len(receive) != 0:
+
+        if receive[:15] == 'number to sign:':
+            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
+                      (process_instance_id, message_id, receive[16:]))
+            connection.commit()
+
         if receive[:25] == 'Here is IPFS link and key':
             key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
             ipfs_link = receive.split('\n\n')[1]
@@ -57,7 +84,8 @@ def send(msg):
             x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?)",
                       (process_instance_id, message_id, ipfs_link, key))
             connection.commit()
-        elif receive[:26] == 'Here is plaintext and salt':
+
+        if receive[:26] == 'Here is plaintext and salt':
             plaintext = receive.split('\n\n')[0].split('Here is plaintext and salt: ')[1]
             salt = receive.split('\n\n')[1]
 
@@ -66,22 +94,17 @@ def send(msg):
             connection.commit()
 
 
-message_id = '3040228034230455139'
-slice_id = '17784891227382173989'
-requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
+message_id = '16306416882996833967'
+slice_id = '16623008412896754699'
+reader_address = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
-# msg = b'9139315610039915578'
-# hash = int.from_bytes(sha512(msg).digest(), byteorder='big')
-# y.execute("SELECT * FROM privateKeys WHERE address = ?", (requester,))
-# user_privateKey = y.fetchall()
-# signature = pow(hash, int(user_privateKey[0][2]), int(user_privateKey[0][1]))
+# send("Start handshake||" + str(message_id) + '||' + reader_address)
 
-# send("Please certify signature||" + requester)
+signature_sending = sign_number(message_id)
 
+# send("Generate my key||" + message_id + '||' + reader_address + '||' + str(signature_sending))
 
-# send("Generate my key||" + message_id + '||' + requester)
-
-send("Access my data||" + message_id + '||' + slice_id + '||' + requester)
+send("Access my data||" + message_id + '||' + slice_id + '||' + reader_address + '||' + str(signature_sending))
 
 # exit()
 

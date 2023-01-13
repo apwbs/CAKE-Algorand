@@ -60,6 +60,6 @@ def check_plaintext(process_instance_id, message_id, slice_id):
 
 
 if __name__ == "__main__":
-    message_id = 3040228034230455139
-    slice_id = 17784891227382173989
+    message_id = 16306416882996833967
+    slice_id = 16623008412896754699
     check_plaintext(process_instance_id, message_id, slice_id)

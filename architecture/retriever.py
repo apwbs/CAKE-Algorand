@@ -46,3 +46,14 @@ def retrieveSKMPublicKey(application_id, skm_address):
             if 'bytes' in part[1]['value']:
                 if encode_address(base64.b64decode(part[1]['value']['bytes'])) == skm_address:
                     return base64.b64decode(part[0]['value']['bytes']).decode('utf-8')
+
+
+def retrieveReaderPublicKey(application_id, reader_address):
+    response = indexer_client.search_transactions(application_id=application_id)
+    response['transactions'].reverse()
+    for i in range(len(response['transactions'])):
+        part = response['transactions'][i]['global-state-delta']
+        if base64.b64decode(part[0]['key']) == b'pk_ipfs_link':
+            if 'bytes' in part[1]['value']:
+                if encode_address(base64.b64decode(part[1]['value']['bytes'])) == reader_address:
+                    return base64.b64decode(part[0]['value']['bytes']).decode('utf-8')
