@@ -43,7 +43,7 @@ manufacturer_address = config('ADDRESS_MANUFACTURER')
 def sign_number():
     x.execute("SELECT * FROM handshake_number WHERE process_instance=?", (process_instance_id,))
     result = x.fetchall()
-    number_to_sign = result[0][1]
+    number_to_sign = result[0][2]
 
     x.execute("SELECT * FROM rsa_private_key WHERE reader_address=?", (sender,))
     result = x.fetchall()
@@ -76,11 +76,12 @@ def send(msg):
     if len(receive) != 0:
 
         if receive[:15] == 'Number to sign:':
-            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?)", (process_instance_id, receive[16:]))
+            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
+                      (process_instance_id, sender, receive[16:]))
             connection.commit()
 
         if receive[:23] == 'Here is the message_id:':
-            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?)", (process_instance_id, receive[16:]))
+            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?)", (process_instance_id, sender, receive[16:]))
             connection.commit()
 
 
@@ -89,15 +90,15 @@ g = open('files/data.json')
 
 message_to_send = g.read()
 
-policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
+# policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
 
-# entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
-# entries_string = '###'.join(str(x) for x in entries)
+entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
+entries_string = '###'.join(str(x) for x in entries)
 
-# policy = ['1604423002081035210 and MANUFACTURER',
-#           '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-#           '1604423002081035210 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
-# policy_string = '###'.join(policy)
+policy = ['1604423002081035210 and (MANUFACTURER or SUPPLIER)',
+          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+policy_string = '###'.join(policy)
 
 # data = json.load(f)
 # entries = list(data.keys())
@@ -105,7 +106,7 @@ policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRON
 # print(entries_string)
 # exit()
 
-entries_string = ''
+# entries_string = ''
 
 sender = manufacturer_address
 

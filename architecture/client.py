@@ -12,7 +12,7 @@ x = connection.cursor()
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5050
+PORT = 5051
 FORMAT = 'utf-8'
 server_sni_hostname = 'example.com'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -34,10 +34,10 @@ conn.connect(ADDR)
 
 
 def sign_number(message_id):
-    x.execute("SELECT * FROM handshake_number WHERE process_instance=? AND message_id=?",
-              (process_instance_id, message_id))
+    x.execute("SELECT * FROM handshake_number WHERE process_instance=? AND message_id=? AND reader_address=?",
+              (process_instance_id, message_id, reader_address))
     result = x.fetchall()
-    number_to_sign = result[0][2]
+    number_to_sign = result[0][3]
 
     x.execute("SELECT * FROM rsa_private_key WHERE reader_address=?", (reader_address,))
     result = x.fetchall()
@@ -70,31 +70,31 @@ def send(msg):
     if len(receive) != 0:
 
         if receive[:15] == 'number to sign:':
-            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
-                      (process_instance_id, message_id, receive[16:]))
+            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
+                      (process_instance_id, message_id, reader_address, receive[16:]))
             connection.commit()
 
         if receive[:25] == 'Here is IPFS link and key':
             key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
             ipfs_link = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?)",
-                      (process_instance_id, message_id, ipfs_link, key))
+            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
+                      (process_instance_id, message_id, reader_address, ipfs_link, key))
             connection.commit()
 
         if receive[:26] == 'Here is plaintext and salt':
             plaintext = receive.split('\n\n')[0].split('Here is plaintext and salt: ')[1]
             salt = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?)",
-                      (process_instance_id, message_id, slice_id, plaintext, salt))
+            x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
+                      (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
             connection.commit()
             print(plaintext)
 
 
-message_id = '108007077434468998'
-slice_id = '0'
-reader_address = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
+message_id = '5784144008624535056'
+slice_id = '4710808010212980750'
+reader_address = '47J2YQQJMLLT3IPG2CH2UY4KWQITXDGQFXVXX5RN7HNBJCTG7VBZP6SGGQ'
 
 # send("Start handshake||" + str(message_id) + '||' + reader_address)
 

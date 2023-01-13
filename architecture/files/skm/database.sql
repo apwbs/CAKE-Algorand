@@ -17,7 +17,7 @@ CREATE TABLE generated_key_reader (
     ipfs_message_link TEXT,
     reader_address TEXT,
     secret_key TEXT,
-    primary key (process_instance_id, message_id)
+    primary key (process_instance_id, message_id, reader_address)
 );
 
 CREATE TABLE handshake_numbers ( 
@@ -25,7 +25,7 @@ CREATE TABLE handshake_numbers (
     message_id TEXT,
     reader_address TEXT,
     handshake_number TEXT,
-    primary key (process_instance, message_id)
+    primary key (process_instance, message_id, reader_address)
 );
 
 CREATE TABLE readers_public_keys ( 

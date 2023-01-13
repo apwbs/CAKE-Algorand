@@ -15,12 +15,14 @@ CREATE TABLE rsa_private_key (
 
 CREATE TABLE handshake_number ( 
     process_instance TEXT,
+    sender_address TEXT,
     number_to_sign TEXT,
-    primary key (process_instance)
+    primary key (process_instance, sender_address)
 );
 
 CREATE TABLE messages ( 
     process_instance TEXT,
     message_id TEXT,
+    sender_address TEXT,
     primary key (process_instance, message_id)
 );
