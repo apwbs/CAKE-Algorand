@@ -89,15 +89,15 @@ g = open('files/data.json')
 
 message_to_send = g.read()
 
-# policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
+policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
 
-entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
-entries_string = '###'.join(str(x) for x in entries)
+# entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
+# entries_string = '###'.join(str(x) for x in entries)
 
-policy = ['1604423002081035210 and MANUFACTURER',
-          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
-policy_string = '###'.join(policy)
+# policy = ['1604423002081035210 and MANUFACTURER',
+#           '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+#           '1604423002081035210 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+# policy_string = '###'.join(policy)
 
 # data = json.load(f)
 # entries = list(data.keys())
@@ -105,7 +105,7 @@ policy_string = '###'.join(policy)
 # print(entries_string)
 # exit()
 
-# entries_string = ''
+entries_string = ''
 
 sender = manufacturer_address
 

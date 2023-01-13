@@ -22,9 +22,6 @@ server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
 client_key = 'Keys/client.key'
 
-# connection = sqlite3.connect('Database_Reader/private_key.db')
-# y = connection.cursor()
-
 """
 creation and connection of the secure channel using SSL protocol
 """
@@ -95,8 +92,8 @@ def send(msg):
             print(plaintext)
 
 
-message_id = '16306416882996833967'
-slice_id = '16623008412896754699'
+message_id = '108007077434468998'
+slice_id = '0'
 reader_address = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # send("Start handshake||" + str(message_id) + '||' + reader_address)
