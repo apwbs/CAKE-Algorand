@@ -66,8 +66,8 @@ def send(msg):
             connection.commit()
 
 
-message_id = '5388148990832263896'
-slice_id = '0'
+message_id = '3040228034230455139'
+slice_id = '17784891227382173989'
 requester = 'K2J47GKYN5CGNZWYIF6VO6AL63TLCB24JMZJAUMX63XPVQH4DU5IBN3GDE'
 
 # msg = b'9139315610039915578'

@@ -111,6 +111,8 @@ def main(message, entries, access_policy, sender):
         print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file)))
 
+        return message_id
+
     else:
         now = datetime.now()
         now = int(now.strftime("%Y%m%d%H%M%S%f"))
@@ -170,3 +172,5 @@ def main(message, entries, access_policy, sender):
 
         print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file)))
+
+        return message_id
