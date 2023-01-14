@@ -6,9 +6,10 @@ import json
 from decouple import config
 import sqlite3
 
-# Connection to SQLite3 reader database
-connection = sqlite3.connect('files/reader/reader.db')
-x = connection.cursor()
+## PENSO SIA DA TOGLIERE
+# # Connection to SQLite3 reader database
+# connection = sqlite3.connect('files/reader/reader.db')
+# x = connection.cursor()
 
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
