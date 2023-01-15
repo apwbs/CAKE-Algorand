@@ -48,6 +48,8 @@ def check_plaintext(process_instance_id, message_id, slice_id):
                 x.execute("SELECT * FROM plaintext WHERE process_instance=? AND message_id=? AND slice_id=?",
                     (str(process_instance_id), str(message_id), str(slice_id)))
                 result = x.fetchall()
+                # result[0][4]
+                # result[0][5]
                 plaintext = result[0][3]
                 salt = result[0][4]
 
