@@ -14,7 +14,7 @@ import sqlite3
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5050
+PORT = 5051
 FORMAT = 'utf-8'
 server_sni_hostname = 'example.com'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -82,7 +82,7 @@ def send(msg):
             connection.commit()
 
         if receive[:23] == 'Here is the message_id:':
-            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?)", (process_instance_id, sender, receive[16:]))
+            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, sender, receive[16:]))
             connection.commit()
 
 

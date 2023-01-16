@@ -92,8 +92,8 @@ def send(msg):
             print(plaintext)
 
 
-message_id = '5784144008624535056'
-slice_id = '4710808010212980750'
+message_id = '2194010642773077942'
+slice_id = '10213156370442080575'
 reader_address = '47J2YQQJMLLT3IPG2CH2UY4KWQITXDGQFXVXX5RN7HNBJCTG7VBZP6SGGQ'
 
 # send("Start handshake||" + str(message_id) + '||' + reader_address)
