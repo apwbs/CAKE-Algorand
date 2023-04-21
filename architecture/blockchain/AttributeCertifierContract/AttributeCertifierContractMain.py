@@ -1,16 +1,13 @@
 from AttributeCertifierContract import *
 from algosdk.atomic_transaction_composer import AtomicTransactionComposer
 import sys
+import argparse
 
-# sys.path.insert(0, '../')
-# from util import *
-sys.path.insert(1, 'blockchain/')
-from util import *
 
 # user declared account mnemonics
-creator_mnemonic = "infant flag husband illness gentle palace eye tilt large reopen current purity enemy depart couch moment gate transfer address diamond vital between unlock able cave"
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+creator_mnemonic = config('PASSPHRASE_CREATOR')
+algod_address = config('ALGOD_ADDRESS')
+algod_token = config('ALGOD_TOKEN')
 headers = {
     "X-API-Key": algod_token,
 }
@@ -114,14 +111,9 @@ def createApp(
 
 
 def main(params):
-    # sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
     sender_private_key = params[1]
-    # sender_address = account.address_from_private_key(creator_private_key)
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
-
-    # app_id, contract = createApp(algod_client, sender_private_key)
-    # print('App id: ', app_id)
 
     print("--------------------------------------------")
     print("Saving readers attributes in the application......")
@@ -130,7 +122,23 @@ def main(params):
     hash_file = params[4]
     saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
 
+def deploy():
+    sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
+
+    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
+
+    app_id, contract = createApp(algod_client, sender_private_key)
+    print('App id: ', app_id)
+    #print('\nSetting APPLICATION_ID_CERTIFIER=' + str(app_id) + ' in .env')
+    set_application_id('APPLICATION_ID_CERTIFIER', str(app_id))
 
 if __name__ == "__main__":
-    # main()
-    main(sys.argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d' ,'--deploy', action='store_true')
+    args = parser.parse_args()
+    sys.path.insert(1, 'blockchain/')
+    from util import *
+    if args.deploy:
+        deploy()
+    else:
+        main(sys.argv)

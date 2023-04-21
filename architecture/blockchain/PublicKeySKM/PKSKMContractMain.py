@@ -1,16 +1,15 @@
 from PKSKMContract import *
 from algosdk.atomic_transaction_composer import AtomicTransactionComposer
 import sys
+import argparse
+from decouple import config
 
-# sys.path.insert(0, '../')
-# from util import *
-sys.path.insert(1, 'blockchain/')
-from util import *
+
 
 # user declared account mnemonics
-creator_mnemonic = "infant flag husband illness gentle palace eye tilt large reopen current purity enemy depart couch moment gate transfer address diamond vital between unlock able cave"
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+creator_mnemonic = config('PASSPHRASE_CREATOR')
+algod_address = config('ALGOD_ADDRESS')
+algod_token = config('ALGOD_TOKEN')
 headers = {
     "X-API-Key": algod_token,
 }
@@ -113,24 +112,37 @@ def createApp(
     return app_id, contract
 
 
-def main(params):
-    # creator_private_key = get_private_key_from_mnemonic(creator_mnemonic)
-    creator_private_key = params[1]
-    creator_address = account.address_from_private_key(creator_private_key)
-    # print(creator_address)
+
+def deploy():
+    sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
 
-    # app_id, contract = createApp(algod_client, creator_private_key)
-    # print('App id: ', app_id)
+    app_id, contract = createApp(algod_client, sender_private_key)
+    print('App id: ', app_id)
+#    print('Set APPLICATION_ID_PK_SKM = ' + str(app_id) + ' in .env')
+    set_application_id('APPLICATION_ID_PK_SKM', app_id)
 
+
+def main(params):
+    sender_private_key = params[1]
+
+    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
     print("--------------------------------------------")
-    print("Saving elements of an authority in the application......")
+    print("Saving message in the application......")
     app_id = params[2]
-    ipfs_link = params[3]
-    saveData(algod_client, creator_private_key, app_id, creator_address, ipfs_link)
+    message_id = params[3]
+    hash_file = params[4]
+    saveData(algod_client, sender_private_key, app_id, message_id, hash_file)
 
 
 if __name__ == "__main__":
-    # main()
-    main(sys.argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d' ,'--deploy', action='store_true')
+    args = parser.parse_args()
+    sys.path.insert(1, 'blockchain/')
+    from util import *
+    if args.deploy:
+        deploy()
+    else:
+        main(sys.argv)
