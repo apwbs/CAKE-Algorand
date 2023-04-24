@@ -110,10 +110,24 @@ def createApp(
     return app_id, contract
 
 
-def main(params):
-    sender_private_key = params[1]
+def main(sender_private_key, app_id, process_id, hash_file):
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
+
+    print("--------------------------------------------")
+    print("Saving readers attributes in the application......")
+    saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
+
+'''
+def main(params):
+    # sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
+    sender_private_key = params[1]
+    # sender_address = account.address_from_private_key(creator_private_key)
+
+    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
+
+    # app_id, contract = createApp(algod_client, sender_private_key)
+    # print('App id: ', app_id)
 
     print("--------------------------------------------")
     print("Saving readers attributes in the application......")
@@ -121,7 +135,7 @@ def main(params):
     process_id = params[3]
     hash_file = params[4]
     saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
-
+'''
 def deploy():
     sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
 
@@ -133,12 +147,18 @@ def deploy():
     set_application_id('APPLICATION_ID_CERTIFIER', str(app_id))
 
 if __name__ == "__main__":
+    #return main(sys.argv)
     parser = argparse.ArgumentParser()
     parser.add_argument('-d' ,'--deploy', action='store_true')
+    parser.add_argument('-sender', '--sender_private_key', type=str, default='', help='Cerifier private key')
+    parser.add_argument('-app', '--app_id', type=str, default='', help='App id of certifier')
+    parser.add_argument('-process', '--process_id', type=str, default='', help='Process instance id')
+    parser.add_argument('-hash', '--hash_file', type=str, default='', help='')
+
     args = parser.parse_args()
     sys.path.insert(1, 'blockchain/')
     from util import *
     if args.deploy:
         deploy()
-    else:
-        main(sys.argv)
+        exit()
+    main(args.sender_private_key, args.app_id, args.process_id, args.hash_file)
