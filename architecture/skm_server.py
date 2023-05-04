@@ -17,7 +17,7 @@ app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5051
+PORT = 5052
 server_cert = 'Keys/server.crt'
 server_key = 'Keys/server.key'
 client_certs = 'Keys/client.crt'
