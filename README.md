@@ -99,10 +99,12 @@ To send a request via SSL, open the 'client.sh' file, specify the constants like
 If the policy allows it, you will read the data you requested on the terminal.
 If the address used has already performed a handshake and a key generation request, it will be necessary to use ```sh client.py``` setting the variables in the same way.
 
-### API
-FLASK
+## API Guide
+CAKE also has an API to manage its interaction, this section describes its structure and use.
+
+### Requirement
+To use the api you need to install flask, open the terminal and run `pip install flask`.
+To interract with the API you need to user requests library. So 
+###
 
 
-MANCA LA PARTE DELLE CHIAVI
-
-Si potrebbe capire da soli se c'è già un handshake
