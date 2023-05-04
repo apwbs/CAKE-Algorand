@@ -20,6 +20,20 @@ supplier2_address = config('ADDRESS_SUPPLIER2')
 conn = sqlite3.connect('files/attribute_certifier/attribute_certifier.db')
 x = conn.cursor()
 
+def store_process_id_to_env(value):
+    name = 'PROCESS_INSTANCE_ID'
+    with open('../.env', 'r', encoding='utf-8') as file:
+        data = file.readlines()
+    edited = False
+    for line in data:
+        if line.startswith(name):
+            data.remove(line)
+            break
+    line = name + "=" + value + "\n"
+    data.append(line)
+
+    with open('../.env', 'w', encoding='utf-8') as file:
+        file.writelines(data)
 
 def generate_attributes():
     now = datetime.now()
@@ -53,6 +67,8 @@ def generate_attributes():
     print(
         os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                   (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
+
+    store_process_id_to_env(str(process_instance_id))
 
 if __name__ == "__main__":
     generate_attributes()

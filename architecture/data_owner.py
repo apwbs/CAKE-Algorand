@@ -16,7 +16,7 @@ process_instance_id = config('PROCESS_INSTANCE_ID')
 print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
-PORT = 5053
+PORT = 5051
 FORMAT = 'utf-8'
 server_sni_hostname = 'SAPIENZA'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -99,9 +99,10 @@ message_to_send = g.read()
 entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
 entries_string = '###'.join(str(x) for x in entries)
 
-policy = ['4908682665013540152 and (MANUFACTURER or SUPPLIER)',
-          '4908682665013540152 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-          '4908682665013540152 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+
+policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
 policy_string = '###'.join(policy)
 
 # data = json.load(f)
