@@ -25,9 +25,9 @@ class CAKEBridge:
         self.ADDR = (self.SERVER, self.PORT)
 
         # Set up SSL parameters
-        self.server_cert = '../Keys/server.crt'
-        self.client_cert = '../Keys/client.crt'
-        self.client_key = '../Keys/client.key'
+        self.server_cert = 'Keys/server.crt'
+        self.client_cert = 'Keys/client.crt'
+        self.client_key = 'Keys/client.key'
 
         self.__connect__()
 

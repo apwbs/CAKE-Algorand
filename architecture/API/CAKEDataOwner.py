@@ -6,7 +6,7 @@ from CAKEBridge import CAKEBridge
 class CAKEDataOwner(CAKEBridge):
 
     def __init__(self, process_instance_id = config('PROCESS_INSTANCE_ID')):
-        super().__init__("../files/data_owner/data_owner.db", 5050, process_instance_id=process_instance_id)
+        super().__init__("files/data_owner/data_owner.db", 5051, process_instance_id=process_instance_id)
         self.manufacturer_address = config('ADDRESS_MANUFACTURER')
         return
     
@@ -38,13 +38,13 @@ class CAKEDataOwner(CAKEBridge):
 
     def handshake(self):
         print("Start handshake")
-        self.send("Start handshake||" + self.manufacturer_address)
+        self.send("Start handshake§" + self.manufacturer_address)
         self.disconnect()
         return
     
     def cipher_data(self, message_to_send, entries_string, policy_string):
         signature_sending = self.sign_number()
-        self.send("Cipher this message||" + message_to_send + '||' + entries_string + '||' + policy_string + '||' + self.manufacturer_address   + '||' + str(signature_sending))
+        self.send("Cipher this message§" + message_to_send + '§' + entries_string + '§' + policy_string + '§' + self.manufacturer_address   + '§' + str(signature_sending))
         self.disconnect()
         return
     

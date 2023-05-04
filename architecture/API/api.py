@@ -164,5 +164,10 @@ def attribute_certification():
     Certifier.attribute_certification(roles)
     return "Attribute certification done"
 
+@app.route('/test/', methods=['GET', 'POST'])
+def test():
+    import os
+    os.system("ls")
+    return "Test done"
 if __name__ == '__main__':
-    app.run(port=8888)
+    app.run(port=8889)
