@@ -104,7 +104,54 @@ CAKE also has an API to manage its interaction, this section describes its struc
 
 ### Requirement
 To use the api you need to install flask, open the terminal and run `pip install flask`.
-To interract with the API you need to user requests library. So 
+To interract with the API you need to user requests library. So your python script have to import it.  
+```python
+    import requests 
+
+    #YOUR CODE
+```
+### Initizialization
+The database resetting and the deployment of the contract cannot be done using the API, you have to open your terminal and run in 'CAKE-Algorand/architecture' `sh resetDB.sh` and `sh deploy.sh`.
+
+It is possible to read the keys and certify the attributes through the API.
+
+```python
+    import requests 
+
+    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
+    roles =
+
+    input = {'actors': actors, 'roles': roles}
+
+    response = requests.post('http://127.0.0.1:8888/certification', json = input)
+
+```
+
+### Interraction with SDM 
+
+```python
+    import requests 
+
+    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
+    roles =
+
+    input = {'actors': actors, 'roles': roles}
+
+    response = requests.post('http://127.0.0.1:8888/dataOwner/handshake', json = input)
+
+```
+### Interraction with SKM
+
+```python
+    import requests 
+
+    response = requests.post('http://127.0.0.1:8888/client/handshake', json = input)
+
+```
+
+### SDM server interaction
+
 ###
+
 
 
