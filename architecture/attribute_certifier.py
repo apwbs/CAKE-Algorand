@@ -25,7 +25,7 @@ def generate_attributes():
     now = datetime.now()
     now = int(now.strftime("%Y%m%d%H%M%S%f"))
     random.seed(now)
-    process_instance_id = random.randint(1, 2 ** 64)
+    process_instance_id = random.randint(1, 2 ** 63)
     print(f'process instance id: {process_instance_id}')
 
     dict_users = {
@@ -50,11 +50,9 @@ def generate_attributes():
     x.execute("INSERT OR IGNORE INTO user_attributes VALUES (?,?,?)",
               (str(process_instance_id), hash_file, file_to_str))
     conn.commit()
-
     print(
-        os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py %s %s %s %s' %
+        os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                   (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
-
 
 if __name__ == "__main__":
     generate_attributes()
