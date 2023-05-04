@@ -111,7 +111,7 @@ To interract with the API you need to user requests library. So your python scri
     #YOUR CODE
 ```
 ### Initizialization
-The database resetting and the deployment of the contract cannot be done using the API, you have to open your terminal and run in 'CAKE-Algorand/architecture' `sh resetDB.sh` and `sh deploy.sh`.
+The database resetting and the deployment of the contract cannot be done using the API, you have to open your terminal and run in 'CAKE-Algorand/architecture' `sh resetDB.sh` and `sh deploy.sh`. At this point is possible to lunch the API, running `python3 API/api.py`.
 
 It is possible to read the keys and certify the attributes through the API.
 
@@ -132,10 +132,22 @@ It is possible to read the keys and certify the attributes through the API.
 ```python
     import requests 
 
-    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
-    roles =
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    
+    entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates', 'GlossTerm']]
 
-    input = {'actors': actors, 'roles': roles}
+    policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+
+    g = open('your/data.json')
+
+    message_to_send = g.read()
+
+    input = {'process_id': process_instance_id,
+        'entries': entries,
+        'policy' : policy, 
+        'message': messate_to_send}
 
     response = requests.post('http://127.0.0.1:8888/dataOwner/handshake', json = input)
 
@@ -145,6 +157,16 @@ It is possible to read the keys and certify the attributes through the API.
 ```python
     import requests 
 
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    slice_id = '123'
+    message_id = '456'
+    reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
+
+    input = {'process_id' : process_instance_id,
+        'slice_id' : slice_id
+        'message_id': message_id
+        'reader' : reader_address}
+        
     response = requests.post('http://127.0.0.1:8888/client/handshake', json = input)
 
 ```
