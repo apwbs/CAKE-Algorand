@@ -1,12 +1,5 @@
-message_id='15839363558658261024'
-reader_address='0x22b9d3F9b828B1ec90B2b331d06C42842846E8D6'
-slice_id='15343280084724660903'
+message_id='15216642079681679070' #substitute with your message id
+reader_address='S4HU4ZINJ5YHL2OBW3VM6S5HLKRSRR2XWPVDFMHGEKR5TVHV2VOFLOEWGE' #substitute with your reader address
+slice_id='10275806781444632806' #subsitute with your slice id
 
-#python3 client.py --handshake --message_id $message_id --reader_address $reader_address
-#python3 client.py -gs --message_id $message_id --reader_address $reader_address 
 python3 client.py -ad --message_id $message_id --reader_address $reader_address --slice_id $slice_id
-
-#slice id: 15343280084724660903
-#slice id: 1293068278316455013
-#slice id: 9899746035376444931
-#message id: 15839363558658261024
