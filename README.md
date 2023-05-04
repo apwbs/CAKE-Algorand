@@ -113,6 +113,17 @@ To interract with the API you need to user requests library. So your python scri
 ### Initizialization
 The database resetting and the deployment of the contract cannot be done using the API, you have to open your terminal and run in 'CAKE-Algorand/architecture' `sh resetDB.sh` and `sh deploy.sh`. At this point is possible to lunch the API, running `python3 API/api.py`.
 
+The terminal will show the base path to use to interract the API (in the following example it is 'http://127.0.0.1:8888/')
+
+```
+root@7e473ad21d74:/CAKE-Algorand/architecture# python3 API/api.py 
+ * Serving Flask app 'api' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:8888/ (Press CTRL+C to quit)
+```
 It is possible to read the keys and certify the attributes through the API.
 
 ```python
@@ -172,10 +183,6 @@ It is possible to read the keys and certify the attributes through the API.
     response = requests.post('http://127.0.0.1:8888/client/handshake', json = input)
 
 ```
-
-### SDM server interaction
-
-###
 
 
 
