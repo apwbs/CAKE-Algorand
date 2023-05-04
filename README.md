@@ -79,11 +79,30 @@ policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
           process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
 ```
 
+The run `sh data_owner.py` to make an handshake an a ciphering request. It's also possible to split these two action running `python3 data_owner.py -hs` to handshake and `python3 data_owner.py -c` to cipher.
+At this point,the SDM Server will print the 'slice_id' and 'message_id' values, these information will be used to key requesting.
+```
+[STARTING] server is starting...
+[LISTENING] Server is listening on 172.17.0.2
+[NEW CONNECTION] ('172.17.0.2', 58680) connected.
+[ACTIVE CONNECTIONS] 1
+Handshake successful
+slice id: 11405747102899531556
+slice id: 3622467048620169296
+slice id: 8386550832079592906
+message id: 6389222717092303342
+ipfs hash: QmXoat6pFTVWqahzXvCQTgQ37y7GjUjCBikqFe2cYGUyCi
+```
+### Access to data
 
-### SDM and SKM Servers 
+To send a request via SSL, open the 'client.sh' file, specify the constants like 'reader_address', 'message_id' and 'slice_id, then run ```python3 skm_server.py```. Then, run ```sh client.py```. This command make an handshake between the reader and the skm_server, then it request a key generation and in the end it use to access to the data.
+If the policy allows it, you will read the data you requested on the terminal.
+If the address used has already performed a handshake and a key generation request, it will be necessary to use ```sh client.py``` setting the variables in the same way.
 
 ### API
 FLASK
 
 
 MANCA LA PARTE DELLE CHIAVI
+
+Si potrebbe capire da soli se c'è già un handshake
