@@ -26,7 +26,6 @@ Open .env with an editor and save your ALGOD_TOKEN and ALGOD_ADDRESS using this 
 ```python
 ALGOD_TOKEN = '2HrTwfGLLo3Ly5jqxsI7LhQ4iui1EPt7m7NVc7Bb'
 ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
-
 ```
 Then, you have to generate the keys you need, you can proceed running `python3 account_creation.py -a` in '\CAKE-Algorand', in this way your `.env` file will be populad. Be careful because this operation can lead to the deletion of any private and public keys saved in the `.env` if it is already populed. Alternatively, you can proceed generating keys and copying manually then in `.env` build a file like in the example. To do this you have to run `python3 account_creation.py` in \CAKE-Algorand.
 
@@ -68,7 +67,18 @@ Open the attribute certifier file, 'attribute_certifier.py', and write down the 
 ```
 Next, opening 'architecture' directory with you terminal an using the `sh initialize.sh` command you can initialize CAKE.This command creates the necessary databases, resetting the ones already initialized if present, deploys the applications on the Algorand network. In the end, it read the actors' keys and skm's keys, and store the defined attributes in the past step on the blockchain. 
 
-###
+### Message ciphering and delivering
+Firstly, run the SDM server with `python3 sdm_server.py`. To cipher a message and store it on the blockchain, open the 'data_owner.py' file. Modify the file 'data.json' with the data you want to cipher. Then, modify the access policy and the entries that you need to cipher with a particular policy.
+
+```python
+entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
+```
+```python
+policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+```
+
 
 ### SDM and SKM Servers 
 
