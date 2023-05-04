@@ -134,7 +134,9 @@ It is possible to read the keys and certify the attributes through the API.
 
     process_instance_id = 1234567890 #Process id generated after the attribute certification
     
-    entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates', 'GlossTerm']]
+    entries = [['ID', 'SortAs', 'GlossTerm'],
+        ['Acronym', 'Abbrev'],
+        ['Specs', 'Dates', 'GlossTerm']]
 
     policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
           process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
@@ -166,7 +168,7 @@ It is possible to read the keys and certify the attributes through the API.
         'slice_id' : slice_id
         'message_id': message_id
         'reader' : reader_address}
-        
+
     response = requests.post('http://127.0.0.1:8888/client/handshake', json = input)
 
 ```
