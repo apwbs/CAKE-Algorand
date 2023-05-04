@@ -4,6 +4,7 @@ import ssl
 from hashlib import sha512
 from decouple import config
 import sqlite3
+import argparse
 
 # Connection to SQLite3 reader database
 connection = sqlite3.connect('files/reader/reader.db')
@@ -12,9 +13,9 @@ x = connection.cursor()
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5051
+PORT = 5052
 FORMAT = 'utf-8'
-server_sni_hostname = 'example.com'
+server_sni_hostname = 'Sapienza'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "172.17.0.2"
 ADDR = (SERVER, PORT)
@@ -96,14 +97,34 @@ message_id = '2194010642773077942'
 slice_id = '10213156370442080575'
 reader_address = '47J2YQQJMLLT3IPG2CH2UY4KWQITXDGQFXVXX5RN7HNBJCTG7VBZP6SGGQ'
 
-# send("Start handshake||" + str(message_id) + '||' + reader_address)
+parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-m', '--message_id', type=str, default=message_id, help='Message ID')
+parser.add_argument('-s', '--slice_id', type=str, default=slice_id, help='Slice ID')
+parser.add_argument('-rd', '--reader_address', type=str, default=reader_address, help='Reader address')
 
-signature_sending = sign_number(message_id)
+#TODO: add the other arguments
+parser.add_argument('-hs', '--handshake', action='store_true', help='Handshake')
+parser.add_argument('-gs', '--generate_key', action='store_true', help='Generate key')
+parser.add_argument('-ad','--access_data',  action='store_true', help='Access data')
+args = parser.parse_args()
 
-# send("Generate my key||" + message_id + '||' + reader_address + '||' + str(signature_sending))
+message_id = args.message_id
+slice_id = args.slice_id
+reader_address = args.reader_address
 
-send("Access my data||" + message_id + '||' + slice_id + '||' + reader_address + '||' + str(signature_sending))
+print("message_id: ", message_id)
+print("slice_id: ", slice_id)
+print("reader_address: ", reader_address)
+
+if args.handshake:
+    send("Start handshake||" + str(message_id) + '||' + reader_address) #and exit()
+
+if args.generate_key or args.access_data:   
+    signature_sending = sign_number(message_id)
+    if args.generate_key:
+        send("Generate my key||" + message_id + '||' + reader_address + '||' + str(signature_sending))
+    if args.access_data:
+        send("Access my data||" + message_id + '||' + slice_id + '||' + reader_address + '||' + str(signature_sending))
 
 # exit()
-
 send(DISCONNECT_MESSAGE)
