@@ -123,13 +123,14 @@ def deploy():
 
 
 def main(creator_private_key, app_id, ipfs_link):
-    creator_private_key = get_private_key_from_mnemonic(creator_mnemonic)
     creator_address = account.address_from_private_key(creator_private_key)
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
     print("--------------------------------------------")
     print("Saving message in the application......")
 
+    print("Creator address:", creator_address)
+    print("Creator private key:", creator_private_key)
     saveData(algod_client, creator_private_key, app_id, creator_address, ipfs_link)
 
 if __name__ == "__main__":
@@ -146,4 +147,5 @@ if __name__ == "__main__":
     if args.deploy:
         deploy()
         exit()
+    
     main(args.creator_private_key, args.app_id, args.ipfs_link)

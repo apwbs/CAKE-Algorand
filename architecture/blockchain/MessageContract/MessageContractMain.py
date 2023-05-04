@@ -124,14 +124,11 @@ def deploy():
 
 
 def main(sender_private_key, app_id, message_id, hash_file):
-    sender_private_key = params[1]
+    #sender_private_key = params[1]
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
     print("--------------------------------------------")
     print("Saving message in the application......")
-    app_id = params[2]
-    message_id = params[3]
-    hash_file = params[4]
     saveData(algod_client, sender_private_key, app_id, message_id, hash_file)
 
 
@@ -139,8 +136,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d' ,'--deploy', action='store_true')
     parser.add_argument('-sender', '--sender_private_key', type=str, default='', help='Cerifier private key')
-    parser.add_argument('-message', '--message_id', type=str, default='', help='App id of certifier')
     parser.add_argument('-app', '--app_id', type=str, default='', help='Process instance id')
+    parser.add_argument('-message', '--message_id', type=str, default='', help='App id of certifier')
     parser.add_argument('-hash', '--hash_file', type=str, default='', help='')
 
     args = parser.parse_args()
@@ -149,4 +146,4 @@ if __name__ == "__main__":
     if args.deploy:
         deploy()
         exit()
-    main(args.certifier_private_key, args.app_id_certifier, args.process_instance_id, args.hash_file)
+    main(args.sender_private_key, args.app_id, args.message_id, args.hash_file)
