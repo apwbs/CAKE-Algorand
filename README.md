@@ -79,6 +79,20 @@ policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
           process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
 ```
 
+The message to be encrypted must be saved in the path 'CAKE-Algorand/architecture/file/data.json'. The following example is an instance of a cipherable message.
+
+```json
+{
+    "ID": "SGML",
+    "SortAs": "LMGS",
+    "GlossTerm": "Standard Generalized Markup Language",
+    "Acronym": "GSML",
+    "Abbrev": "ISO 8879:1986",
+    "Specs": "928162",
+    "Dates": "NOW"
+}
+```
+
 The run `sh data_owner.py` to make an handshake an a ciphering request. It's also possible to split these two action running `python3 data_owner.py -hs` to handshake and `python3 data_owner.py -c` to cipher.
 At this point,the SDM Server will print the 'slice_id' and 'message_id' values, these information will be used to key requesting.
 ```
@@ -155,6 +169,8 @@ These two data structures will have to be inserted in a dictionary, with 'actors
 
 ```
 
+At the end of this operation, it is important to take note of the corresponding process_id, which will be displayed on the terminal.
+
 This request can be splitted in the following three differents request to the api server, like in the following three subsections. For a correct functioning it is necessary to carry out these operations in the proposed order.
 
 #### Read public key
@@ -168,7 +184,8 @@ It is necessary to construct a list with the names of the actors, and then a ins
 
     input = {'actors': actors}
 
-    response = requests.post('http://127.0.0.1:8888/certification/readpublickey', json = input)
+    response = requests.post('http://127.0.0.1:8888/certification/readpublickey',
+        json = input)
 
 ```
 
@@ -196,13 +213,38 @@ This dictonary will have to be inserted in a dictionary, with 'roles' as key, an
         'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'],
          'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
 
-    input = {'actors': actors, 'roles': roles}
+    input = {'roles': roles}
 
-    response = requests.post('http://127.0.0.1:8888/certification/attributecertification', json = input)
+    response = requests.post('http://127.0.0.1:8888/certification/attributecertification',
+        json = input)
 
 ```
 
+At the end of this operation, it is important to take note of the corresponding process_id, which will be displayed on the terminal.
+
 ### Interraction with SDM 
+
+The python script described in this section allows to send message to the SDM server using the API. 
+With a request to 'api_base_path/dataOwner/fullrequest' it's possible to make an handshake between the MANUMANUFACTURER and the SDM, an then cipher a message setting the policy.
+The following example is an instance of a cipherable message
+
+```json
+{
+    "ID": "SGML",
+    "SortAs": "LMGS",
+    "GlossTerm": "Standard Generalized Markup Language",
+    "Acronym": "GSML",
+    "Abbrev": "ISO 8879:1986",
+    "Specs": "928162",
+    "Dates": "NOW"
+}
+```
+
+It is necessary to build a dictionary, with the described information associated with the following keys:
+- `'processe_id'` : the process_id showed at the end of attribute certification
+- `'entries'` : a list in which each element is a group of entries of the message to be encrypted which will be associated with the same privacy. These groups are represented by a list of strings, where the strings are associated with the keys of the json file.
+- `'policy'` : a string list containing the process_id and the specific policy for the group of entries with the same index in the 'entries' vector. The correct formatting can be seen in the next code example.
+- `'message'` : a string generated from reading the json file
 
 ```python
     import requests 
@@ -226,9 +268,53 @@ This dictonary will have to be inserted in a dictionary, with 'roles' as key, an
         'policy' : policy, 
         'message': messate_to_send}
 
-    response = requests.post('http://127.0.0.1:8888/dataOwner/handshake', json = input)
-
+    response = requests.post('http://127.0.0.1:8888/dataOwner/fullrequest',
+        json = input)
 ```
+
+#### Handshake
+
+
+```python
+    import requests 
+
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    
+    input = {'process'_id : process_instance_id}
+
+    response = requests.post('http://127.0.0.1:8888/dataOwner/handshake',
+        json = input)
+```
+
+#### Cipher
+
+
+```python
+    import requests 
+
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    
+    entries = [['ID', 'SortAs', 'GlossTerm'],
+        ['Acronym', 'Abbrev'],
+        ['Specs', 'Dates', 'GlossTerm']]
+
+    policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+
+    g = open('your/data.json')
+
+    message_to_send = g.read()
+
+    input = {'process_id': process_instance_id,
+        'entries': entries,
+        'policy' : policy, 
+        'message': messate_to_send}
+
+    response = requests.post('http://127.0.0.1:8888/dataOwner/cipher',
+        json = input)
+```
+
 ### Interraction with SKM
 
 ```python
@@ -244,9 +330,63 @@ This dictonary will have to be inserted in a dictionary, with 'roles' as key, an
         'message_id': message_id
         'reader' : reader_address}
 
-    response = requests.post('http://127.0.0.1:8888/client/handshake', json = input)
+    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+        json = input)
 
 ```
 
+#### Handshake
 
+```python
+    import requests 
 
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    message_id = '456'
+    reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
+
+    input = {'process_id' : process_instance_id,
+        'message_id': message_id
+        'reader' : reader_address}
+
+    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+        json = input)
+
+```
+
+#### Generate Keys
+
+```python
+    import requests 
+
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    message_id = '456'
+    reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
+
+    input = {'process_id' : process_instance_id,
+        'message_id': message_id
+        'reader' : reader_address}
+
+    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+        json = input)
+
+```
+
+#### Access Data
+
+```python
+    import requests 
+
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    slice_id = '123'
+    message_id = '456'
+    reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
+
+    input = {'process_id' : process_instance_id,
+        'slice_id' : slice_id
+        'message_id': message_id
+        'reader' : reader_address}
+
+    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+        json = input)
+
+```
