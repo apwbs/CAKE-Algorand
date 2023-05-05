@@ -9,6 +9,19 @@ from datetime import datetime
 import json
 import os
 
+'''
+def store_process_id_to_env(process_instance_id):
+    print(f'process instance id: {process_instance_id}')
+    
+    with open('../.env', 'r', encoding='utf-8') as file:
+        data = file.readlines()
+    data[0] = 'PROCESS_INSTANCE_ID=' + str(process_instance_id) + '\n'
+
+    with open('../.env', 'w', encoding='utf-8') as file:
+        file.writelines(data)
+    print("Stored process instance id to .env file")
+    return
+'''
 
 class Certifier():
     def certify(actors, roles):
@@ -158,14 +171,14 @@ class Certifier():
             os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                     (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
         
-        return process_instance_id
-    
-    def change_process_id(process_instance_id):
         print(f'process instance id: {process_instance_id}')
-        
+        '''
         with open('../.env', 'r', encoding='utf-8') as file:
             data = file.readlines()
         data[0] = 'PROCESS_INSTANCE_ID=' + str(process_instance_id) + '\n'
 
         with open('../.env', 'w', encoding='utf-8') as file:
             file.writelines(data)
+        #__store_process_id_to_env__(str(process_instance_id))
+        '''
+        return process_instance_id

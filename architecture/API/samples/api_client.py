@@ -32,6 +32,6 @@ if args.generate_key:
     response = requests.post('http://127.0.0.1:8888/client/generateKey',
         json = input)
 if args.access_data:
-    response = requests.post('http://127.0.0.1:8888/client/accessaData',
+    response = requests.post('http://127.0.0.1:8888/client/accessData',
         json = input)
                 
