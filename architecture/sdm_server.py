@@ -80,7 +80,11 @@ def check_handshake(reader_address, signature):
     if getfile[0].split(b': ')[1].decode('utf-8') == reader_address:
         hash = int.from_bytes(sha512(msg).digest(), byteorder='big')
         hashFromSignature = pow(int(signature), public_key_e, public_key_n)
-        print(hash == hashFromSignature)
+        if hash == hashFromSignature:
+            print("Handshake successful")
+        else:
+            print("Handshake failed")
+        #print(hash == hashFromSignature)
         return hash == hashFromSignature
 
 
