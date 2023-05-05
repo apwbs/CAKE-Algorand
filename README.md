@@ -364,3 +364,5 @@ By adding the value of the slice id corresponding to the portion of the message 
         json = input)
 
 ```
+
+At this point it will be possible for the reader to make access requests for any slice_id of the message without having to carry out the previous two steps.
