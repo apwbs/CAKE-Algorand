@@ -168,8 +168,8 @@ These two data structures will have to be inserted in a dictionary, with 'actors
     response = requests.post('http://127.0.0.1:8888/certification', json = input)
 
 ```
-
-At the end of this operation, it is important to take note of the corresponding process_id, which will be displayed on the terminal.
+This method return as response the process, to access to this value you can use `response.text`. This value has to be stored on the .env.
+At the end of this run, you have to lunch the SDM and SKM servers using `python3 sdm_server.py` and `python3 skm_server.py`.
 
 This request can be splitted in the following three differents request to the api server, like in the following three subsections. For a correct functioning it is necessary to carry out these operations in the proposed order.
 
@@ -220,7 +220,8 @@ This dictonary will have to be inserted in a dictionary, with 'roles' as key, an
 
 ```
 
-At the end of this operation, it is important to take note of the corresponding process_id, which will be displayed on the terminal.
+This method return as response the process, to access to this value you can use `response.text`. This value has to be stored on the .env.
+At the end of this run, you have to lunch the SDM and SKM servers using `python3 sdm_server.py` and `python3 skm_server.py`.
 
 ### Interraction with SDM 
 
@@ -244,7 +245,7 @@ It is necessary to build a dictionary, with the described information associated
 - `'processe_id'` : the process_id showed at the end of attribute certification
 - `'entries'` : a list in which each element is a group of entries of the message to be encrypted which will be associated with the same privacy. These groups are represented by a list of strings, where the strings are associated with the keys of the json file.
 - `'policy'` : a string list containing the process_id and the specific policy for the group of entries with the same index in the 'entries' vector. The correct formatting can be seen in the next code example.
-- `'message'` : a string generated from reading the json file
+- `'message'` : a string generated from reading the json file containg the messago to cipher
 
 ```python
     import requests 
@@ -275,6 +276,8 @@ It is necessary to build a dictionary, with the described information associated
 #### Handshake
 
 
+
+
 ```python
     import requests 
 
@@ -287,7 +290,6 @@ It is necessary to build a dictionary, with the described information associated
 ```
 
 #### Cipher
-
 
 ```python
     import requests 
