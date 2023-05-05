@@ -131,17 +131,23 @@ To test if api is correctly working you can run this script anche check if the r
 ```python
     import requests
 
-    response = requests.post('http://127.0.0.1:8888/', json = input)
+    response = requests.get('http://127.0.0.1:8888/')
 ```
 
 ### Read keys and attribute certification
 
+Using the API it is possible to read the keys of the skm server actors, and assign the desired roles to the actors involved.
+It is necessary to define a list with the names of the actors, remember that the name must be the same used inside the env when the address and public key of the actor are specified.
+In addition to a list of strings with the actors involved, a dictionary must be defined that associates the roles assigned to the actors involved. Each actor can have multiple roles, and each role can be assigned multiple times.
+These two data structures will have to be inserted in a dictionary, with 'actors' and 'roles' as keys respectively, and given as input as in the following example during the request to the api server.
 
 ```python
     import requests 
 
     actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
-    roles = {'MANUFACTURER': ['MANUFACTURER'], 'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'], 'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
+    roles = {'MANUFACTURER': ['MANUFACTURER'],
+        'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'],
+        'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
 
     input = {'actors': actors, 'roles': roles}
 
@@ -149,7 +155,7 @@ To test if api is correctly working you can run this script anche check if the r
 
 ```
 
-### Read public key
+#### Read public key
 
 ```python
     import requests 
@@ -162,7 +168,7 @@ To test if api is correctly working you can run this script anche check if the r
 
 ```
 
-###
+#### Read SKM's key
 
 ```python
     import requests 
@@ -171,13 +177,15 @@ To test if api is correctly working you can run this script anche check if the r
 
 ```
 
-### Attribute certification
+#### Attribute certification
 
 ```python
     import requests 
 
     actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
-    roles = {'MANUFACTURER': ['MANUFACTURER'], 'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'], 'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
+    roles = {'MANUFACTURER': ['MANUFACTURER'],
+        'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'],
+         'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
 
     input = {'actors': actors, 'roles': roles}
 
