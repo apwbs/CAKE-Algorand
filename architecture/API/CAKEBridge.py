@@ -33,9 +33,7 @@ class CAKEBridge:
 
     ### Connect to the server
     def __connect__(self):
-        """
-        Creation and connection of the secure channel using SSL protocol
-        """
+        """Creation and connection of the secure channel using SSL protocol"""
         context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=self.server_cert)
         context.load_cert_chain(certfile=self.client_cert, keyfile=self.client_key)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,11 +42,21 @@ class CAKEBridge:
         return
         
     def disconnect(self):
+        """Disconnect from the server"""
         print("Disconnecting")
         self.send(self.DISCONNECT_MESSAGE)
         return
     
     def sign_number(self, number_to_sign, reader_address): 
+        """Sign a number using the private key of the reader
+        
+        Args:
+            number_to_sign (int): number to sign
+            reader_address (str): address of the reader
+        
+        Returns:
+            int: signature of the number
+        """
         self.x.execute("SELECT * FROM rsa_private_key WHERE reader_address=?", (reader_address,))
         result = self.x.fetchall()
         print(result)
