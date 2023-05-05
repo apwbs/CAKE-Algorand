@@ -39,7 +39,7 @@ def generate_attributes():
     now = datetime.now()
     now = int(now.strftime("%Y%m%d%H%M%S%f"))
     random.seed(now)
-    process_instance_id = random.randint(1, 2 ** 63)
+    process_instance_id = random.randint(1, 2 ** 64)
     print(f'process instance id: {process_instance_id}')
 
     dict_users = {
