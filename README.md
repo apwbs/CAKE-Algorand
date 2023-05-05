@@ -155,8 +155,12 @@ These two data structures will have to be inserted in a dictionary, with 'actors
 
 ```
 
+This request can be splitted in the following three differents request to the api server, like in the following three subsections. For a correct functioning it is necessary to carry out these operations in the proposed order.
+
 #### Read public key
 
+Using the method in the example is possible to ask to server to read the keys of the actors stored in the '.env' files.
+It is necessary to construct a list with the names of the actors, and then a insert the list into a dictionary with the key 'actors', like to what was described previously. This dictionary will be input like in the example.
 ```python
     import requests 
 
@@ -170,6 +174,9 @@ These two data structures will have to be inserted in a dictionary, with 'actors
 
 #### Read SKM's key
 
+Using the method in the example is possible to ask to server to read the key of the SKM server stored in the '.env'.
+This method doen't need any input.
+
 ```python
     import requests 
 
@@ -179,10 +186,12 @@ These two data structures will have to be inserted in a dictionary, with 'actors
 
 #### Attribute certification
 
+This method allows you to certify on the blockchain the roles assigned to the actors, whose key has previously been read. A dictionary must be defined that associates the roles assigned to the actors involved. Each actor can have multiple roles, and each role can be assigned multiple times.
+This dictonary will have to be inserted in a dictionary, with 'roles' as key, and given as input as in the following example during the request to the api server.
+
 ```python
     import requests 
 
-    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
     roles = {'MANUFACTURER': ['MANUFACTURER'],
         'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'],
          'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
