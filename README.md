@@ -7,7 +7,7 @@ In this [Docker Hub repository](https://hub.docker.com/repository/docker/apwbs/c
 for the Ethereum and Algorand implementation of the CAKE approach.
 
 ## Guide
-
+ 
 ### Docker execution
 There are two ways to run the system. The first one is to download the corresponding Docker Image for the Algorand implementation stored at the [Docker Hub](https://hub.docker.com/repository/docker/apwbs/cake/general).
 
@@ -124,17 +124,64 @@ root@7e473ad21d74:/CAKE-Algorand/architecture# python3 API/api.py
  * Debug mode: off
  * Running on http://127.0.0.1:8888/ (Press CTRL+C to quit)
 ```
-It is possible to read the keys and certify the attributes through the API.
+
+At this point the API is running, an it's possible interract with it.
+To test if api is correctly working you can run this script anche check if the request status is 200.
+
+```python
+    import requests
+
+    response = requests.post('http://127.0.0.1:8888/', json = input)
+```
+
+### Read keys and attribute certification
+
 
 ```python
     import requests 
 
     actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
-    roles =
+    roles = {'MANUFACTURER': ['MANUFACTURER'], 'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'], 'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
 
     input = {'actors': actors, 'roles': roles}
 
     response = requests.post('http://127.0.0.1:8888/certification', json = input)
+
+```
+
+### Read public key
+
+```python
+    import requests 
+
+    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
+
+    input = {'actors': actors}
+
+    response = requests.post('http://127.0.0.1:8888/certification/readpublickey', json = input)
+
+```
+
+###
+
+```python
+    import requests 
+
+    response = requests.post('http://127.0.0.1:8888/certification/skmpublickey')
+
+```
+
+### Attribute certification
+
+```python
+    import requests 
+
+    actors = ['MANUFACTURER', 'SUPPLIER1', 'SUPPLIER2']
+    roles = {'MANUFACTURER': ['MANUFACTURER'], 'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'], 'SUPPLIER2': ['SUPPLIER', 'MECHANICS']}
+
+    input = {'actors': actors, 'roles': roles}
+
+    response = requests.post('http://127.0.0.1:8888/certification/attributecertification', json = input)
 
 ```
 
