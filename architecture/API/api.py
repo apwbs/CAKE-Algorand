@@ -275,13 +275,14 @@ def certification():
         roles: a dictionary that contains for each actor the list of roles associated
     
     Returns:
-        The status of the request, 200 if the certification is completed
+        The process instance id of the certification process and
+        the status of the request, 200 if the certification is completed
     """
 
     actors = request.json.get('actors')
     roles = request.json.get('roles')
-    Certifier.certify(actors, roles)
-    return "Certification done"
+    process_instance_id = Certifier.certify(actors, roles)
+    return str(process_instance_id), 200
 
 @app.route('/certification/readpublickey/', methods=['POST'])
 def read_public_key():
@@ -326,12 +327,14 @@ def attribute_certification():
         actors: the list of actors involved in the process
         roles: a dictionary that contains for each actor the list of roles associated
         
-    Returns: 
-        The status of the request, 200 if the actors are certified correctly
+    Returns:
+        The process instance id of the certification process and
+        the status of the request, 200 if the certification is completed
     """
     roles = request.json.get('roles')
-    Certifier.attribute_certification(roles)
-    return "Attribute certification done"
+    process_instance_id =  Certifier.attribute_certification(roles)
+
+    return str(process_instance_id), 200
 
 @app.route('/test/', methods=['GET', 'POST'])
 def test():

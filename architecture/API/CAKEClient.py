@@ -9,7 +9,7 @@ class CAKEClient(CAKEBridge):
     ### they are used to sign the message and the can be changed or setted later
     def __init__(self, process_instance_id = config('PROCESS_INSTANCE_ID'), message_id = "", reader_address = "", slice_id = ""):
 
-        super().__init__(path_to_db='/files/reader/reader.db', port=5051, process_instance_id=process_instance_id)
+        super().__init__(path_to_db='files/reader/reader.db', port=5052, process_instance_id=process_instance_id)
         self.__setArgs__(message_id, reader_address, slice_id)
         return
 

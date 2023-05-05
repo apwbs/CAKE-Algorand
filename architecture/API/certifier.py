@@ -15,7 +15,8 @@ class Certifier():
         for actor in actors:
             Certifier.__read_public_key__(actor)
         Certifier.__skm_public_key__()
-        Certifier.__attribute_certification__(roles)
+        return Certifier.__attribute_certification__(roles)
+
 
     def read_public_key(actors):
         for actor in actors:
@@ -156,6 +157,8 @@ class Certifier():
         print(
             os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                     (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
+        
+        return process_instance_id
     
     def change_process_id(process_instance_id):
         print(f'process instance id: {process_instance_id}')
