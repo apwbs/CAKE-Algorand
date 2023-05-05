@@ -225,8 +225,7 @@ At the end of this run, you have to lunch the SDM and SKM servers using `python3
 
 ### Interraction with SDM 
 
-The python script described in this section allows to send message to the SDM server using the API. 
-With a request to 'api_base_path/dataOwner/fullrequest' it's possible to make an handshake between the MANUMANUFACTURER and the SDM, an then cipher a message setting the policy.
+The python script described in this section allows to send message to the SDM server using the API, allowing to cipher a message.
 The following example is an instance of a cipherable message
 
 ```json
@@ -241,7 +240,24 @@ The following example is an instance of a cipherable message
 }
 ```
 
-It is necessary to build a dictionary, with the described information associated with the following keys:
+#### Handshake
+To make an handshake it's necessary to build a dictionary with the process instance id corrisponding to the key 'process_id', and to send a post request to 'dataOwner/handshake'.
+Note that the process instance id is the only value that will be input from here on using as `int`.
+
+```python
+    import requests 
+
+    process_instance_id = 1234567890 #Process id generated after the attribute certification
+    
+    input = {'process_id' : process_instance_id}
+
+    response = requests.post('http://127.0.0.1:8888/dataOwner/handshake',
+        json = input)
+```
+
+#### Cipher
+If the handshaking operation is completed correctly, you can proceed with the encryption of the message.
+You have to build a dictionary, with the described information associated with the following keys:
 - `'processe_id'` : the process_id showed at the end of attribute certification
 - `'entries'` : a list in which each element is a group of entries of the message to be encrypted which will be associated with the same privacy. These groups are represented by a list of strings, where the strings are associated with the keys of the json file.
 - `'policy'` : a string list containing the process_id and the specific policy for the group of entries with the same index in the 'entries' vector. The correct formatting can be seen in the next code example.
@@ -269,94 +285,48 @@ It is necessary to build a dictionary, with the described information associated
         'policy' : policy, 
         'message': message_to_send}
 
-    response = requests.post('http://127.0.0.1:8888/dataOwner/fullrequest',
-        json = input)
-```
-
-#### Handshake
-
-
-
-
-```python
-    import requests 
-
-    process_instance_id = 1234567890 #Process id generated after the attribute certification
-    
-    input = {'process_id' : process_instance_id}
-
-    response = requests.post('http://127.0.0.1:8888/dataOwner/handshake',
-        json = input)
-```
-
-#### Cipher
-
-```python
-    import requests 
-
-    process_instance_id = 1234567890 #Process id generated after the attribute certification
-    
-    entries = [['ID', 'SortAs', 'GlossTerm'],
-        ['Acronym', 'Abbrev'],
-        ['Specs', 'Dates', 'GlossTerm']]
-
-    policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
-          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
-
-    g = open('your/data.json')
-
-    message_to_send = g.read()
-
-    input = {'process_id': process_instance_id,
-        'entries': entries,
-        'policy' : policy, 
-        'message': message_to_send}
-
     response = requests.post('http://127.0.0.1:8888/dataOwner/cipher',
         json = input)
 ```
-
-### Interraction with SKM
-
-```python
-    import requests 
-
-    process_instance_id = 1234567890 #Process id generated after the attribute certification
-    slice_id = '123'
-    message_id = '456'
-    reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
-
-    input = {'process_id' : process_instance_id,
-        'slice_id' : slice_id,
-        'message_id': message_id,
-        'reader_address' : reader_address}
-
-    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
-        json = input)
+At the end of this operation it is important to take note of the slice_id and message_id values generated and displayed on the terminal where the sdm server runs.
 
 ```
+[ACTIVE CONNECTIONS] 1
+Handshake successful
+slice id: 5375500895703771247
+slice id: 17604598720062938551
+slice id: 10338915769088273764
+message id: 13846106420650213324
+```
 
+The slice_id values represent the groups of labels defined in entries, while the message_id is an identifier of the encrypted message.
+
+### Interraction with SKM
+This section describes the methods that allow you to interact with the SKM Server, allowing you to make a handshake with the actors, generate a key and have access to encrypted messages.
 #### Handshake
+
+Also this time a handshaking is necessary, therefore it is necessary to indicate the address of the reader inside the dictionary given in input using the key 'reader address'. It is also necessary to enter the ID of the message to be decrypted using 'message_id' as key, and the process_id as in the previous step.
 
 ```python
     import requests 
 
     process_instance_id = 1234567890 #Process id generated after the attribute certification
-    message_id = '456'
+    message_id = '13846106420650213324' 
     reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
 
     input = {'process_id' : process_instance_id,
         'message_id': message_id,
         'reader_address' : reader_address}
 
-    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+    response = requests.post('http://127.0.0.1:8888/client/handshake',
         json = input)
 
 ```
 
 #### Generate Keys
 
+At this point using the same dictionary of the previous step it is possible to generate a key for the reader.
+
 ```python
     import requests 
 
@@ -368,12 +338,14 @@ It is necessary to build a dictionary, with the described information associated
         'message_id': message_id,
         'reader_address' : reader_address}
 
-    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+    response = requests.post('http://127.0.0.1:8888/client/generateKey',
         json = input)
 
 ```
 
 #### Access Data
+
+By adding the value of the slice id corresponding to the portion of the message to be decrypted to the previously defined dictionary, it is finally possible to access it.
 
 ```python
     import requests 
@@ -388,7 +360,7 @@ It is necessary to build a dictionary, with the described information associated
         'message_id': message_id,
         'reader_address' : reader_address}
 
-    response = requests.post('http://127.0.0.1:8888/client/fullrequest',
+    response = requests.post('http://127.0.0.1:8888/client/accessData',
         json = input)
 
 ```
