@@ -266,7 +266,7 @@ It is necessary to build a dictionary, with the described information associated
     input = {'process_id': process_instance_id,
         'entries': entries,
         'policy' : policy, 
-        'message': messate_to_send}
+        'message': message_to_send}
 
     response = requests.post('http://127.0.0.1:8888/dataOwner/fullrequest',
         json = input)
@@ -280,7 +280,7 @@ It is necessary to build a dictionary, with the described information associated
 
     process_instance_id = 1234567890 #Process id generated after the attribute certification
     
-    input = {'process'_id : process_instance_id}
+    input = {'process_id' : process_instance_id}
 
     response = requests.post('http://127.0.0.1:8888/dataOwner/handshake',
         json = input)
@@ -309,7 +309,7 @@ It is necessary to build a dictionary, with the described information associated
     input = {'process_id': process_instance_id,
         'entries': entries,
         'policy' : policy, 
-        'message': messate_to_send}
+        'message': message_to_send}
 
     response = requests.post('http://127.0.0.1:8888/dataOwner/cipher',
         json = input)
@@ -326,9 +326,9 @@ It is necessary to build a dictionary, with the described information associated
     reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
 
     input = {'process_id' : process_instance_id,
-        'slice_id' : slice_id
-        'message_id': message_id
-        'reader' : reader_address}
+        'slice_id' : slice_id,
+        'message_id': message_id,
+        'reader_address' : reader_address}
 
     response = requests.post('http://127.0.0.1:8888/client/fullrequest',
         json = input)
@@ -345,8 +345,8 @@ It is necessary to build a dictionary, with the described information associated
     reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
 
     input = {'process_id' : process_instance_id,
-        'message_id': message_id
-        'reader' : reader_address}
+        'message_id': message_id,
+        'reader_address' : reader_address}
 
     response = requests.post('http://127.0.0.1:8888/client/fullrequest',
         json = input)
@@ -363,8 +363,8 @@ It is necessary to build a dictionary, with the described information associated
     reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
 
     input = {'process_id' : process_instance_id,
-        'message_id': message_id
-        'reader' : reader_address}
+        'message_id': message_id,
+        'reader_address' : reader_address}
 
     response = requests.post('http://127.0.0.1:8888/client/fullrequest',
         json = input)
@@ -382,9 +382,9 @@ It is necessary to build a dictionary, with the described information associated
     reader_address = 'N2C374IRX7HEX2YEQWJBTRSVRHRUV4ZSF76S54WV4COTHRUNYRCI47R3WU'
 
     input = {'process_id' : process_instance_id,
-        'slice_id' : slice_id
-        'message_id': message_id
-        'reader' : reader_address}
+        'slice_id' : slice_id,
+        'message_id': message_id,
+        'reader_address' : reader_address}
 
     response = requests.post('http://127.0.0.1:8888/client/fullrequest',
         json = input)
