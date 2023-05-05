@@ -5,3 +5,4 @@ __pycache__/
 *.db
 *.json
 architecture/keys
+lunch_docker.sh
