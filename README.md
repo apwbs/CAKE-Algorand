@@ -55,15 +55,31 @@ PASSPHRASE_CREATOR = 'forward girl thought soccer solve debate benefit vulcano o
 At the end of these phase you have to use and Algo Dispenser [like this](https://bank.testnet.algorand.network/) to get some Algo for each of your new addresses.
 
 ### Inizialize CAKE application
+When these passages are completed, the databases for all the actors involved in the process need to be created, and then you have to read the keys of the addresses involved and certify on the blockchain the attributes assignment.
+To specify the actors you want to give a pair, you have to open 'certification.sh' and use this two lined for each actors involved on the top of the shell script:
+```python
+python3 reader_public_key.py --reader 'NAME_OF_THE_ACTOR'
+echo "✅ Readed public key of NAME_OF_THE_ACTOR"
+```
 Open the attribute certifier file, 'attribute_certifier.py', and write down the attributes that you intend to give to the actors of the system. 
 ```python
-    dict_users = {
-        manufacturer_address: [str(process_instance_id), 'MANUFACTURER'],
 
-        supplier1_address: [str(process_instance_id), 'SUPPLIER', 'ELECTRONICS'],
+an_actor_address = config('NAME_OF_THE_ACTOR')
+manufacturer_address = config('ADDRESS_MANUFACTURER')
+supplier1_address = config('ADDRESS_SUPPLIER1')
+supplier2_address = config('ADDRESS_SUPPLIER2')
 
-        supplier2_address: [str(process_instance_id), 'SUPPLIER', 'MECHANICS']
-    }
+
+dict_users = {
+
+    an_actor_address = [str(process_instance_id), 'AN_ATTRIBUTE', 'ANOTHER_ATTRIBUTE'],
+
+    manufacturer_address: [str(process_instance_id), 'MANUFACTURER'],
+
+    supplier1_address: [str(process_instance_id), 'SUPPLIER', 'ELECTRONICS'],
+
+    supplier2_address: [str(process_instance_id), 'SUPPLIER', 'MECHANICS']
+}
 ```
 Next, opening 'architecture' directory with you terminal an using the `sh initialize.sh` command you can initialize CAKE.This command creates the necessary databases, resetting the ones already initialized if present, deploys the applications on the Algorand network. In the end, it read the actors' keys and skm's keys, and store the defined attributes in the past step on the blockchain. 
 
