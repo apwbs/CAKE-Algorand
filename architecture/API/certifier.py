@@ -69,6 +69,10 @@ class Certifier():
 
         Args:
             roles (dict): a dict that map each actor to a list of its roles
+        
+        Returns:
+            int : process instance id
+            
         """
         return Certifier.__attribute_certification__(roles)
 
