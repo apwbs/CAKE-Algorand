@@ -21,12 +21,14 @@ to create a container starting from the image created in the previous step. To r
 other instances. Using `docker exec` you can open as many independent containers as you like.
 
 ### Set enviroments
-Before deploying the contracts it is necessary to create the private and public keys necessary for the process in the .`env` file, together with the network access TOKEN information.
-Open .env with an editor and save your ALGOD_TOKEN and ALGOD_ADDRESS using this syntax:
+Before deploying the contracts it is necessary to create the private and public keys necessary for the process in the .`env` file, together with the network access TOKEN information. You can generate and copy a token on [PureStake](https://developer.purestake.io/).
+Then, open .env with an editor and compile it saving your token as 'ALGOD_TOKEN' and a link to the testnet api as 'ALGOD_ADDRESS, like in the example.
+
 ```python
-ALGOD_TOKEN = '2HrTwfGLLo3Ly5jqxsI7LhQ4iui1EPt7m7NVc7Bb'
+ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
 ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
 ```
+
 Then, you have to generate the keys you need, you can proceed running `python3 account_creation.py -a` in '\CAKE-Algorand', in this way your `.env` file will be populad. Be careful because this operation can lead to the deletion of any private and public keys saved in the `.env` if it is already populed. Alternatively, you can proceed generating keys and copying manually then in `.env` build a file like in the example. To do this you have to run `python3 account_creation.py` in \CAKE-Algorand.
 
 At the end of this phase the file .env should contains these content
