@@ -34,7 +34,7 @@ Then, you have to generate the keys you need, you can proceed running `python3 a
 At the end of this phase the file .env should contains these content
 
 ```python
-ALGOD_TOKEN = '2HrTwpGLLo3Ty5jqxsI2LhQ4aua1EPt1m2NVc4Bb'
+ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
 ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
 
 ADDRESS_CERTIFIER = 'T4PMAA6ODUO3OUAKMG5SFMKYYYSZZIITXReFEXWMIEE2ED2ZIVWHNFG62Q'
