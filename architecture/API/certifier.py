@@ -24,7 +24,24 @@ def store_process_id_to_env(process_instance_id):
 '''
 
 class Certifier():
+    """ Manage the certification of the attributes of the actors
+
+    A collectio of static methods to read the public keys of the actors, 
+    the public key of the SKM and to certify the attributes of the actors
+    """
     def certify(actors, roles):
+        """ Read the public keys of actors and SKM, and certify the attributes of the actors
+
+        Read the public keys of each actor in actors, then read the public key of the SKM 
+        and certify the attributes of the actors
+
+        Args:
+            actors (list): list of actors
+            roles (dict): a dict that map each actor to a list of its roles
+
+        Returns:
+            int : process instance id
+        """
         for actor in actors:
             Certifier.__read_public_key__(actor)
         Certifier.__skm_public_key__()
@@ -32,17 +49,39 @@ class Certifier():
 
 
     def read_public_key(actors):
+        """ Read the public keys of each actor in actors
+        
+        Args:
+            actors (list): list of actors
+        """
         for actor in actors:
             Certifier.__read_public_key__(actor)
 
     def skm_public_key():
+        """ Read the public key of the SKM"""
         Certifier.__skm_public_key__()
 
     def attribute_certification(roles):
-        Certifier.__attribute_certification__(roles)
+        """ Certify the attributes of the actors
+
+        Certify the attributes of the actors on the blockchain.
+        The certification is performed by the SKM.
+
+        Args:
+            roles (dict): a dict that map each actor to a list of its roles
+        """
+        return Certifier.__attribute_certification__(roles)
 
 
     def __read_public_key__(actor_name):
+        """ Read the public and private key of an actor
+
+        Read the public and private key of an actor from .env and store them in a SQLite3 database
+        and on the blockchain on the PKReadersContract  
+
+        Args:
+            actor_name (str): name of the actor
+        """
         api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
         print("Reading keys of " + actor_name)
@@ -89,6 +128,11 @@ class Certifier():
             private_key, app_id_pk_readers, hash_file)))
 
     def __skm_public_key__():
+        """ Read the public and private key of the SKM
+
+        Read the public and private key of the SKM from .env and store them in a SQLite3 database
+        and on the blockchain on the PKSKMContract
+        """
         api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
         print("Reading keys of SKM")
@@ -126,6 +170,17 @@ class Certifier():
 
 
     def __attribute_certification__(roles):
+        """ Certify the attributes of the actors
+
+        Certify the attributes of the actors on the blockchain.
+        The certification is performed by the SKM.
+
+        Args:
+            roles (dict): a dict that map each actor to a list of its roles
+
+        Returns:
+            int : the process instance id of the certification process
+        """
 
         app_id_certifier = config('APPLICATION_ID_CERTIFIER')
 
