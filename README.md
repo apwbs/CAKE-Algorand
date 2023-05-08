@@ -136,7 +136,7 @@ CAKE also has an API to manage its interaction, this section describes its struc
 
 ### Requirement
 To use the api you need to install flask, open the terminal and run `pip install flask`.
-To interract with the API you need to user requests library. So your python script have to import it.  
+To interact with the API you need to user requests library. So your python script have to import it.  
 ```python
     import requests 
 
@@ -145,7 +145,7 @@ To interract with the API you need to user requests library. So your python scri
 ### Initizialization
 The database resetting and the deployment of the contract cannot be done using the API, you have to open your terminal and run in 'CAKE-Algorand/architecture' `sh resetDB.sh` and `sh deploy.sh`. At this point is possible to lunch the API, running `python3 API/api.py`.
 
-The terminal will show the base path to use to interract the API (in the following example it is 'http://127.0.0.1:8888/')
+The terminal will show the base path to use to interact the API (in the following example it is 'http://127.0.0.1:8888/')
 
 ```
 root@7e473ad21d74:/CAKE-Algorand/architecture# python3 API/api.py 
@@ -157,7 +157,7 @@ root@7e473ad21d74:/CAKE-Algorand/architecture# python3 API/api.py
  * Running on http://127.0.0.1:8888/ (Press CTRL+C to quit)
 ```
 
-At this point the API is running, an it's possible interract with it.
+At this point the API is running, an it's possible interact with it.
 To test if api is correctly working you can run this script anche check if the request status is 200.
 
 ```python
@@ -241,7 +241,7 @@ This dictonary will have to be inserted in a dictionary, with 'roles' as key, an
 This method return as response the process, to access to this value you can use `response.text`. This value has to be stored on the .env.
 At the end of this run, you have to lunch the SDM and SKM servers using `python3 sdm_server.py` and `python3 skm_server.py`.
 
-### Interraction with SDM 
+### Interaction with SDM 
 
 The python script described in this section allows to send message to the SDM server using the API, allowing to cipher a message.
 The following example is an instance of a cipherable message
@@ -319,7 +319,7 @@ message id: 13846106420650213324
 
 The slice_id values represent the groups of labels defined in entries, while the message_id is an identifier of the encrypted message.
 
-### Interraction with SKM
+### Interaction with SKM
 This section describes the methods that allow you to interact with the SKM Server, allowing you to make a handshake with the actors, generate a key and have access to encrypted messages.
 #### Handshake
 
