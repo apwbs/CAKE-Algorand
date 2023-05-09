@@ -69,30 +69,29 @@ def send(msg):
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
     print(receive)
-    if len(receive) != 0:
-        if receive.startswith('Number to be signed: '):
-            len_initial_message = len('Number to be signed: ')
-            print("Signo")
-            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
-                      (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
-            connection.commit()
+    if receive.startswith('Number to be signed: '):
+        len_initial_message = len('Number to be signed: ')
+        print("Signo")
+        x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
+                    (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
+        connection.commit()
 
-        if receive.startswith('Here are the IPFS link and key'):
-            key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
-            ipfs_link = receive.split('\n\n')[1]
+    if receive.startswith('Here are the IPFS link and key'):
+        key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
+        ipfs_link = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                      (process_instance_id, message_id, reader_address, ipfs_link, key))
-            connection.commit()
+        x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
+                    (process_instance_id, message_id, reader_address, ipfs_link, key))
+        connection.commit()
 
-        if receive.startswith('Here are the plaintext and salt'):
-            plaintext = receive.split('\n\n')[0].split('Here are the plaintext and salt: ')[1]
-            salt = receive.split('\n\n')[1]
+    if receive.startswith('Here are the plaintext and salt'):
+        plaintext = receive.split('\n\n')[0].split('Here are the plaintext and salt: ')[1]
+        salt = receive.split('\n\n')[1]
 
-            x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
-                      (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
-            connection.commit()
-            print(plaintext)
+        x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
+                    (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
+        connection.commit()
+        print(plaintext)
 
 parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-m', '--message_id', type=str, default="", help='Message ID')

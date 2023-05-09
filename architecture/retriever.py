@@ -29,7 +29,6 @@ def retrieveReaderAttributes(application_id, process_instance_id):
 
 def retrieveMessage(application_id, message_id):
     response = indexer_client.search_transactions(application_id=application_id)
-    print("application_id:", application_id )
     for i in range(len(response['transactions'])):
         part = response['transactions'][i]['global-state-delta']
         if base64.b64decode(part[1]['key']) == b'msg_id':

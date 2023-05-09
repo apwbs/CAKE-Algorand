@@ -230,7 +230,7 @@ class Certifier():
             os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                     (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
         
-        print(f'process instance id: {process_instance_id}')
+        #print(f'process instance id: {process_instance_id}')
         '''
         with open('../.env', 'r', encoding='utf-8') as file:
             data = file.readlines()

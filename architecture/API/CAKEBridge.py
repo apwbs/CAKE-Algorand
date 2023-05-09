@@ -40,7 +40,7 @@ class CAKEBridge:
         # Read process instance id from .env file
         #self.process_instance_id = config('PROCESS_INSTANCE_ID')
         self.process_instance_id = process_instance_id
-        print("Process instance id:", self.process_instance_id)
+        #print("Process instance id:", self.process_instance_id)
         # Set up connection parameters
         # TODO: Move this to a config file
         self.HEADER = 64

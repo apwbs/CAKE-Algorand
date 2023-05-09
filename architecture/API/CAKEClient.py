@@ -58,30 +58,29 @@ class CAKEClient(CAKEBridge):
         print(message)
         self.conn.send(message)
         receive = self.conn.recv(6000).decode(self.FORMAT)
-        if len(receive) != 0:
-            print(receive)
-            if receive.startswith('Number to be signed:'):
-                len_initial_message = len('Number to be signed: ')
-                self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
-                        (self.process_instance_id, self.message_id, self.reader_address, receive[len_initial_message:]))
-                self.connection.commit()
+        print(receive)
+        if receive.startswith('Number to be signed:'):
+            len_initial_message = len('Number to be signed: ')
+            self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
+                    (self.process_instance_id, self.message_id, self.reader_address, receive[len_initial_message:]))
+            self.connection.commit()
 
-            if receive.startswith('Here are the IPFS link and key'):
-                key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
-                ipfs_link = receive.split('\n\n')[1]
-    
-                self.x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                        (self.process_instance_id, self.message_id, self.reader_address, ipfs_link, key))
-                self.connection.commit()
+        if receive.startswith('Here are the IPFS link and key'):
+            key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
+            ipfs_link = receive.split('\n\n')[1]
 
-            if  receive.startswith('Here are the plaintext and salt'):
-                plaintext = receive.split('\n\n')[0].split('Here are the plaintext and salt: ')[1]
-                salt = receive.split('\n\n')[1]
+            self.x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
+                    (self.process_instance_id, self.message_id, self.reader_address, ipfs_link, key))
+            self.connection.commit()
 
-                self.x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
-                        (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext, salt))
-                self.connection.commit()
-                print(plaintext)
+        if  receive.startswith('Here are the plaintext and salt'):
+            plaintext = receive.split('\n\n')[0].split('Here are the plaintext and salt: ')[1]
+            salt = receive.split('\n\n')[1]
+
+            self.x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
+                    (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext, salt))
+            self.connection.commit()
+            print(plaintext)
         return receive
     
     def handshake(self):

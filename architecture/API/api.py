@@ -212,10 +212,11 @@ def cipher():
 
     entries_string = '###'.join(str(x) for x in entries)
     policy_string = '###'.join(str(x) for x in policy)
-
+    '''
     print("Message is: " + message)
-    print("Entries are: " + entries_string)
-    print("Policy is: " + policy_string)
+    print("\nEntries are: " + entries_string)
+    print("\nPolicy is: " + policy_string)
+    '''
 
     data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
     data_owner.cipher_data(message, entries_string, policy_string)

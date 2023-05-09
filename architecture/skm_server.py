@@ -70,7 +70,6 @@ def check_handshake(message_id, reader_address, signature):
     x.execute("SELECT * FROM handshake_numbers WHERE process_instance=?  AND message_id=? AND reader_address=?",
               (str(process_instance_id), message_id, reader_address))
     result = x.fetchall()
-    print("Result: ", result)
     number_to_sign = result[0][3]
     msg = str(number_to_sign).encode()
     public_key_ipfs_link = retriever.retrieveReaderPublicKey(app_id_pk_readers, reader_address)
@@ -106,7 +105,6 @@ def handle_client(conn, addr):
             # print(f"[{addr}] {msg}")
             conn.send("Msg received!".encode(FORMAT))
             message = msg.split('§')
-            print(message)
             if message[0] == "Start handshake":
                 number_to_sign = generate_number_to_sign(message[1], message[2])
                 conn.send(b'Number to be signed: ' + str(number_to_sign).encode())

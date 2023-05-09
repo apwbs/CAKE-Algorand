@@ -7,8 +7,8 @@ parser.add_argument('-hs', '--handshake', action='store_true', help='Handshake')
 parser.add_argument('-gk', '--generate_key', action='store_true', help='Generate key')
 parser.add_argument('-ad','--access_data',  action='store_true', help='Access data')
 parser.add_argument('-fr', '--full_request', action='store_true', help='Full request')
-#parser.add_argument('-s', '--slice', type=int, default=0)
-#parser.add_argument('-r', '--reader', type=int, default=0)
+parser.add_argument('-s', '--slice', type=int, default=0)
+parser.add_argument('-r', '--reader', type=int, default=0)
 args = parser.parse_args()
 
 process_instance_id = config('PROCESS_ID') #Process id generated after the attribute certification

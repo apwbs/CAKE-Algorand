@@ -39,8 +39,8 @@ class CAKEDataOwner(CAKEBridge):
         # print(send_length)
         self.conn.send(message)
         receive = self.conn.recv(6000).decode(self.FORMAT)
-        if receive.startswith('Number to be signed:'):
-            len_initial_message = len('Number to be signed:')
+        if receive.startswith('Number to be signed: '):
+            len_initial_message = len('Number to be signed: ')
             self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
                     (self.process_instance_id, self.manufacturer_address, receive[len_initial_message:]))
             self.connection.commit()
@@ -74,9 +74,8 @@ class CAKEDataOwner(CAKEBridge):
         Returns:
             str: signature
         """
-        print("Process instance id:", self.process_instance_id)
+        #print("Process instance id:", self.process_instance_id)
         self.x.execute("SELECT * FROM handshake_number WHERE process_instance=?", (self.process_instance_id,))
         result = self.x.fetchall()
-        print(result)
         number_to_sign = result[0][2]
         return super().sign_number(number_to_sign, self.manufacturer_address)
