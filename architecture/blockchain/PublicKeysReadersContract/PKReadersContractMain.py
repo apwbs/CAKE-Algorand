@@ -129,8 +129,6 @@ def main(creator_private_key, app_id, ipfs_link):
     print("--------------------------------------------")
     print("Saving message in the application......")
 
-    print("Creator address:", creator_address)
-    print("Creator private key:", creator_private_key)
     saveData(algod_client, creator_private_key, app_id, creator_address, ipfs_link)
 
 if __name__ == "__main__":
@@ -143,6 +141,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     sys.path.insert(1, 'blockchain/')
+    sys.path.insert(0, '../')
     from util import *
     if args.deploy:
         deploy()

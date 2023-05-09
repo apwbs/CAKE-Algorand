@@ -142,6 +142,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     sys.path.insert(1, 'blockchain/')
+    sys.path.insert(0, '../')
     from util import *
     if args.deploy:
         deploy()
