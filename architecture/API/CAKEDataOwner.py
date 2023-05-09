@@ -36,7 +36,6 @@ class CAKEDataOwner(CAKEBridge):
         send_length = str(msg_length).encode(self.FORMAT)
         send_length += b' ' * (self.HEADER - len(send_length))
         self.conn.send(send_length)
-        # print(send_length)
         self.conn.send(message)
         receive = self.conn.recv(6000).decode(self.FORMAT)
         if receive.startswith('Number to be signed: '):
