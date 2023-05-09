@@ -111,7 +111,7 @@ def handle_client(conn, addr):
             message = msg.split('§')
             if message[0] == "Start handshake":
                 number_to_sign = generate_number_to_sign(message[1])
-                conn.send(b'Number to sign: ' + str(number_to_sign).encode())
+                conn.send(b'Number to be signed: ' + str(number_to_sign).encode())
             if message[0] == "Cipher this message":
                 if check_handshake(message[4], message[5]):
                     message_id = cipher(message)

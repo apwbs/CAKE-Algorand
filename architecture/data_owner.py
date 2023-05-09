@@ -78,13 +78,12 @@ def send(msg):
     receive = conn.recv(6000).decode(FORMAT)
     print(receive)
     if len(receive) != 0:
-
-        if receive[:15] == 'Number to sign:':
+        if receive.startswith('Number to be signed:'):
+            len_initial_message = len('Number to be signed:')
             x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
-                      (process_instance_id, sender, receive[16:]))
+                      (process_instance_id, sender, receive[len_initial_message:]))
             connection.commit()
-
-        if receive[:23] == 'Here is the message_id:':
+        if receive.startswith('Here is the message_id:'):
             x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, sender, receive[16:]))
             connection.commit()
 

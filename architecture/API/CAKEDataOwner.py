@@ -39,16 +39,14 @@ class CAKEDataOwner(CAKEBridge):
         # print(send_length)
         self.conn.send(message)
         receive = self.conn.recv(6000).decode(self.FORMAT)
-        if len(receive) != 0:
-            print(receive)
-            if receive[:15] == 'Number to sign:':
-                self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
-                        (self.process_instance_id, self.manufacturer_address, receive[16:]))
-                self.connection.commit()
-
-            if receive[:23] == 'Here is the message_id:':
-                self.x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (self.process_instance_id, self.manufacturer_address, receive[16:]))
-                self.connection.commit()
+        if receive.startswith('Number to be signed:'):
+            len_initial_message = len('Number to be signed:')
+            self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
+                    (self.process_instance_id, self.manufacturer_address, receive[len_initial_message:]))
+            self.connection.commit()
+        if receive.startswith('Here is the message_id:'):
+            self.x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (self.process_instance_id, self.manufacturer_address, receive[16:]))
+            self.connection.commit()
 
     def handshake(self):
         """Handshake with the CAKE SDM server"""
