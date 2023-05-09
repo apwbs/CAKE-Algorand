@@ -18,7 +18,7 @@ print("process_instance_id: " + process_instance_id + "\n\n")
 HEADER = 64
 PORT = 5051
 FORMAT = 'utf-8'
-server_sni_hostname = 'SAPIENZA'
+server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = "172.17.0.2"
 ADDR = (SERVER, PORT)

@@ -46,7 +46,7 @@ class CAKEBridge:
         self.HEADER = 64
         self.PORT = port
         self.FORMAT = 'utf-8'
-        self.server_sni_hostname = 'Sapienza'
+        self.server_sni_hostname = config('SERVER_SNI_HOSTNAME')
         self.DISCONNECT_MESSAGE = "!DISCONNECT"
         self.SERVER = "172.17.0.2"
         self.ADDR = (self.SERVER, self.PORT)
