@@ -127,7 +127,7 @@ class Certifier():
                 (reader_address, hash_file, str(keyPair.n), str(keyPair.e)))
         connection.commit()
 
-        print('private key: ' + private_key)
+        #print('private key: ' + private_key)
         print(os.system('python3.10 blockchain/PublicKeysReadersContract/PKReadersContractMain.py -creator %s -app %s -ipfs %s' % (
             private_key, app_id_pk_readers, hash_file)))
 
@@ -210,7 +210,7 @@ class Certifier():
         dict_users = {}
         for actor, list_roles in roles.items():
             dict_users[config('ADDRESS_' + actor)] = [str(process_instance_id)] + [role for role in list_roles]
-        print(dict_users)
+        #print(dict_users)
 
         f = io.StringIO()
         dict_users_dumped = json.dumps(dict_users)

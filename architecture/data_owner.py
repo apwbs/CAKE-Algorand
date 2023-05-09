@@ -13,7 +13,7 @@ import argparse
 # x = connection.cursor()
 
 process_instance_id = config('PROCESS_INSTANCE_ID')
-print("process_instance_id: " + process_instance_id + "\n\n")
+#print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
 PORT = 5051
@@ -73,10 +73,9 @@ def send(msg):
     send_length = str(msg_length).encode(FORMAT)
     send_length += b' ' * (HEADER - len(send_length))
     conn.send(send_length)
-    # print(send_length)
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
-    print(receive)
+    #print(receive)
     if len(receive) != 0:
         if receive.startswith('Number to be signed: '):
             len_initial_message = len('Number to be signed: ')
