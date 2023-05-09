@@ -55,7 +55,6 @@ class CAKEClient(CAKEBridge):
         send_length = str(msg_length).encode(self.FORMAT)
         send_length += b' ' * (self.HEADER - len(send_length))
         self.conn.send(send_length)
-        print(message)
         self.conn.send(message)
         receive = self.conn.recv(6000).decode(self.FORMAT)
         print(receive)
@@ -80,7 +79,6 @@ class CAKEClient(CAKEBridge):
             self.x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
                     (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext, salt))
             self.connection.commit()
-            print(plaintext)
         return receive
     
     def handshake(self):
@@ -124,6 +122,5 @@ class CAKEClient(CAKEBridge):
         self.x.execute("SELECT * FROM handshake_number WHERE process_instance=? AND message_id=? AND reader_address=?",
                     (self.process_instance_id, self.message_id, self.reader_address))
         result = self.x.fetchall()
-        print(result)
         number_to_sign = result[0][3]
         return super().sign_number(number_to_sign, self.reader_address)    

@@ -71,7 +71,6 @@ def send(msg):
     print(receive)
     if receive.startswith('Number to be signed: '):
         len_initial_message = len('Number to be signed: ')
-        print("Signo")
         x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
                     (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
         connection.commit()
@@ -91,7 +90,6 @@ def send(msg):
         x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
                     (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
         connection.commit()
-        print(plaintext)
 
 parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-m', '--message_id', type=str, default="", help='Message ID')

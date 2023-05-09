@@ -86,7 +86,6 @@ class CAKEBridge:
         """
         self.x.execute("SELECT * FROM rsa_private_key WHERE reader_address=?", (reader_address,))
         result = self.x.fetchall()
-        print(result)
         private_key = result[0]
 
         private_key_n = int(private_key[1])

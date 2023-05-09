@@ -24,7 +24,7 @@ def check_plaintext(process_instance_id, message_id, slice_id):
 
     if len(body) == 1:
         message_hex = body[0][0][0]
-        print(message_hex)
+        #(message_hex)
 
         x.execute("SELECT * FROM plaintext WHERE process_instance=? AND message_id=? AND slice_id=?",
         (str(process_instance_id), str(message_id), str(0)))
@@ -37,7 +37,11 @@ def check_plaintext(process_instance_id, message_id, slice_id):
         combined_hashed = hashlib.sha256(combined)
         hex_dig = combined_hashed.hexdigest()
 
-        print(hex_dig == message_hex)
+        #print(hex_dig == message_hex)
+        if hex_dig == message_hex:
+            print("Message integrity is intact")
+        else:
+            print("Message integrity is not intact")
 
     else:
         for i, elem in enumerate(body):
@@ -58,7 +62,11 @@ def check_plaintext(process_instance_id, message_id, slice_id):
                 combined_hashed = hashlib.sha256(combined)
                 hex_dig = combined_hashed.hexdigest()
 
-                print(hex_dig == message_hex)
+                if hex_dig == message_hex:
+                    print("Message integrity is intact")
+                else:
+                    print("Message integrity is not intact")
+                #print(hex_dig == message_hex)
 
 
 if __name__ == "__main__":
