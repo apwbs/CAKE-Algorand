@@ -28,9 +28,6 @@ parser.add_argument('-r', '--reader', type=str, default='MANUFACTURER',help='Rea
 args = parser.parse_args()
 reader_address = config('ADDRESS_' + args.reader)
 private_key = config('PRIVATEKEY_' + args.reader)
-print(reader_address)
-print(private_key)
-print(args.reader)
 
 # Connection to SQLite3 reader database
 conn = sqlite3.connect('files/reader/reader.db')
@@ -68,7 +65,6 @@ def generate_keys():
               (reader_address, hash_file, str(keyPair.n), str(keyPair.e)))
     connection.commit()
 
-    print('private key: ' + private_key)
     print(os.system('python3.10 blockchain/PublicKeysReadersContract/PKReadersContractMain.py -creator %s -app %s -ipfs %s' % (
         private_key, app_id_pk_readers, hash_file)))
     
