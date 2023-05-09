@@ -46,7 +46,7 @@ def saveData(
 
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(client, app_id))
+    #print("Global state:", read_global_state(client, app_id))
 
 
 def createApp(
