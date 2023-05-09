@@ -90,6 +90,7 @@ def send(msg):
         x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
                     (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
         connection.commit()
+        print("Plaintext: " + plaintext)
 
 parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-m', '--message_id', type=str, default="", help='Message ID')

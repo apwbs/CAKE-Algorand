@@ -126,7 +126,7 @@ def accessData():
     client.access_data()
     #client.disconnect()   
 
-    return "Data accessed", 200
+    return "Data accessed" , 200
 
 '''
 @app.route('/client/fullrequest/' , methods=['GET', 'POST'])

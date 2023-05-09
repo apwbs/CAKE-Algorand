@@ -79,7 +79,8 @@ class CAKEClient(CAKEBridge):
             self.x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
                     (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext, salt))
             self.connection.commit()
-        return receive
+            print("Plaintext: ", plaintext)
+        return 
     
     def handshake(self):
         """Start the handshake with the CAKE SKM server"""
@@ -99,7 +100,7 @@ class CAKEClient(CAKEBridge):
         signature_sending = self.sign_number()
         self.send("Access my data§" + self.message_id + '§' + self.slice_id + '§' + self.reader_address + '§' + str(signature_sending))
         self.disconnect()
-        return
+        
     
     '''
     def full_request(self):

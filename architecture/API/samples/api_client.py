@@ -41,4 +41,5 @@ if args.access_data:
 if args.full_request:
     response = requests.post('http://127.0.0.1:8888/client/fullRequest',
         json = input)
+    print(response.text)
     exit()
