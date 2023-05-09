@@ -29,7 +29,7 @@ ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
 ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
 ```
 
-Then, you have to generate the keys you need, you can proceed running `python3 account_creation.py -a` in '\CAKE-Algorand', in this way your `.env` file will be populad. Be careful because this operation can lead to the deletion of any private and public keys saved in the `.env` if it is already populed. Alternatively, you can proceed generating keys and copying manually then in `.env` build a file like in the example. To do this you have to run `python3 account_creation.py` in \CAKE-Algorand.
+Then, you have to generate the keys you need, you can proceed running `python3 account_creation.py -A` in '\CAKE-Algorand', in this way your `.env` file will be populad. Be careful because this operation can lead to the deletion of any private and public keys saved in the `.env` if it is already populed. Alternatively, you can proceed generating keys and copying manually then in `.env` build a file like in the example. To do this you have to run `python3 account_creation.py` in \CAKE-Algorand.
 
 At the end of this phase the file .env should contains these content
 
