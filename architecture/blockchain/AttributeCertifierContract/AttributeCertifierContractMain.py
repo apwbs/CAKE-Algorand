@@ -104,7 +104,7 @@ def createApp(
     app_id = transaction.wait_for_confirmation(algod_client, result.tx_ids[0])['application-index']
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(algod_client, app_id))
+    #print("Global state:", read_global_state(algod_client, app_id))
 
     assert app_id is not None and app_id > 0
     return app_id, contract
@@ -118,24 +118,7 @@ def main(sender_private_key, app_id, process_id, hash_file):
     print("Saving readers attributes in the application......")
     saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
 
-'''
-def main(params):
-    # sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
-    sender_private_key = params[1]
-    # sender_address = account.address_from_private_key(creator_private_key)
 
-    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
-
-    # app_id, contract = createApp(algod_client, sender_private_key)
-    # print('App id: ', app_id)
-
-    print("--------------------------------------------")
-    print("Saving readers attributes in the application......")
-    app_id = params[2]
-    process_id = params[3]
-    hash_file = params[4]
-    saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
-'''
 def deploy():
     sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
 

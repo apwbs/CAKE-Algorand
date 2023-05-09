@@ -105,7 +105,7 @@ def createApp(
     app_id = transaction.wait_for_confirmation(algod_client, result.tx_ids[0])['application-index']
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(algod_client, app_id))
+    #print("Global state:", read_global_state(algod_client, app_id))
 
     assert app_id is not None and app_id > 0
     return app_id, contract
