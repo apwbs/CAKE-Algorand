@@ -17,7 +17,7 @@ app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5051
+PORT = int(config('SDM_PORT'))
 server_cert = 'Keys/server.crt'
 server_key = 'Keys/server.key'
 client_certs = 'Keys/client.crt'
@@ -80,7 +80,11 @@ def check_handshake(reader_address, signature):
     if getfile[0].split(b': ')[1].decode('utf-8') == reader_address:
         hash = int.from_bytes(sha512(msg).digest(), byteorder='big')
         hashFromSignature = pow(int(signature), public_key_e, public_key_n)
-        print(hash == hashFromSignature)
+        if hash == hashFromSignature:
+            print("Handshake successful")
+        else:
+            print("Handshake failed")
+        #print(hash == hashFromSignature)
         return hash == hashFromSignature
 
 
@@ -104,10 +108,10 @@ def handle_client(conn, addr):
 
             # print(f"[{addr}] {msg}")
             conn.send("Msg received!".encode(FORMAT))
-            message = msg.split('||')
+            message = msg.split('§')
             if message[0] == "Start handshake":
                 number_to_sign = generate_number_to_sign(message[1])
-                conn.send(b'Number to sign: ' + str(number_to_sign).encode())
+                conn.send(b'Number to be signed: ' + str(number_to_sign).encode())
             if message[0] == "Cipher this message":
                 if check_handshake(message[4], message[5]):
                     message_id = cipher(message)

@@ -4,6 +4,7 @@ import ssl
 from hashlib import sha512
 from decouple import config
 import sqlite3
+import argparse
 
 # Connection to SQLite3 reader database
 connection = sqlite3.connect('files/reader/reader.db')
@@ -12,11 +13,11 @@ x = connection.cursor()
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
 HEADER = 64
-PORT = 5051
+PORT = int(config('SKM_PORT'))
 FORMAT = 'utf-8'
-server_sni_hostname = 'example.com'
+server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "172.17.0.2"
+SERVER = config('SERVER') #
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
@@ -67,43 +68,66 @@ def send(msg):
     conn.send(send_length)
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
-    if len(receive) != 0:
+    #print(receive)
+    if receive.startswith('Number to be signed: '):
+        len_initial_message = len('Number to be signed: ')
+        x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
+                    (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
+        connection.commit()
 
-        if receive[:15] == 'number to sign:':
-            x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
-                      (process_instance_id, message_id, reader_address, receive[16:]))
-            connection.commit()
+    if receive.startswith('Here are the IPFS link and key'):
+        key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
+        ipfs_link = receive.split('\n\n')[1]
 
-        if receive[:25] == 'Here is IPFS link and key':
-            key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
-            ipfs_link = receive.split('\n\n')[1]
+        x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
+                    (process_instance_id, message_id, reader_address, ipfs_link, key))
+        connection.commit()
 
-            x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                      (process_instance_id, message_id, reader_address, ipfs_link, key))
-            connection.commit()
+    if receive.startswith('Here are the plaintext and salt'):
+        plaintext = receive.split('\n\n')[0].split('Here are the plaintext and salt: ')[1]
+        salt = receive.split('\n\n')[1]
 
-        if receive[:26] == 'Here is plaintext and salt':
-            plaintext = receive.split('\n\n')[0].split('Here is plaintext and salt: ')[1]
-            salt = receive.split('\n\n')[1]
+        x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
+                    (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
+        connection.commit()
+        print("Plaintext: " + plaintext)
 
-            x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
-                      (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
-            connection.commit()
-            print(plaintext)
+parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-m', '--message_id', type=str, default="", help='Message ID')
+parser.add_argument('-s', '--slice_id', type=str, default="", help='Slice ID')
+parser.add_argument('-rd', '--reader_address', type=str, default="", help='Reader address')
 
+#TODO: add the other arguments
+parser.add_argument('-hs', '--handshake', action='store_true', help='Handshake')
+parser.add_argument('-gs', '--generate_key', action='store_true', help='Generate key')
+parser.add_argument('-ad','--access_data',  action='store_true', help='Access data')
+args = parser.parse_args()
 
-message_id = '2194010642773077942'
-slice_id = '10213156370442080575'
-reader_address = '47J2YQQJMLLT3IPG2CH2UY4KWQITXDGQFXVXX5RN7HNBJCTG7VBZP6SGGQ'
+message_id = args.message_id
+slice_id = args.slice_id
+reader_address = args.reader_address
 
-# send("Start handshake||" + str(message_id) + '||' + reader_address)
+if args.message_id == "":
+    print("Please insert a message ID")
+    exit()
 
-signature_sending = sign_number(message_id)
+if args.reader_address == "": 
+    print("Please insert a reader address")
+    exit()
 
-# send("Generate my key||" + message_id + '||' + reader_address + '||' + str(signature_sending))
+if args.handshake:
+    send("Start handshake§" + str(message_id) + '§' + reader_address) #and exit()
 
-send("Access my data||" + message_id + '||' + slice_id + '||' + reader_address + '||' + str(signature_sending))
+if args.generate_key or args.access_data:   
+    signature_sending = sign_number(message_id)
+    if args.generate_key:
+        send("Generate my key§" + message_id + '§' + reader_address + '§' + str(signature_sending))
+    if args.access_data:
+        if args.slice_id == "":
+            print("Please insert a slice ID")
+            exit()
+        send("Access my data§" + message_id + '§' + slice_id + '§' + reader_address + '§' + str(signature_sending))
+
 
 # exit()
-
 send(DISCONNECT_MESSAGE)

@@ -107,8 +107,8 @@ def main(message, entries, access_policy, sender):
 
         hash_file = api.add_json(final_message)
         print(f'ipfs hash: {hash_file}')
-
-        print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
+        
+        print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py -sender %s -app %s -message %s -hash %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file)))
 
         return message_id
@@ -170,7 +170,7 @@ def main(message, entries, access_policy, sender):
         hash_file = api.add_json(final_message)
         print(f'ipfs hash: {hash_file}')
 
-        print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py %s %s %s %s' % (
+        print(os.system('python3.10 blockchain/MessageContract/MessageContractMain.py -sender %s -app %s -message %s -hash %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file)))
 
         return message_id

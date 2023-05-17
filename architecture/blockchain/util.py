@@ -55,3 +55,17 @@ def get_method(name: str, js: str) -> Method:
         if m.name == name:
             return m
     raise Exception("No method with the name {}".format(name))
+
+def set_application_id(application_name, application_id):
+    with open('../../../.env', 'r', encoding='utf-8') as file:
+        data = file.readlines()
+    edited = False
+    for line in data:
+        if line.startswith(application_name):
+            data.remove(line)
+            break
+    line = application_name + "='" + str(application_id) + "'\n"
+    data.append(line)
+
+    with open('../../../.env', 'w', encoding='utf-8') as file:
+        file.writelines(data)
