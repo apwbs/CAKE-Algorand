@@ -16,11 +16,11 @@ process_instance_id = config('PROCESS_INSTANCE_ID')
 #print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
-PORT = 5051
+PORT = int(config('SDM_PORT'))
 FORMAT = 'utf-8'
 server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "172.17.0.2"
+SERVER = config('SERVER') #"172.17.0.2"
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
