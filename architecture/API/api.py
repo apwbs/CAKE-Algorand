@@ -209,12 +209,17 @@ def cipher():
     
     #TODO: Check if it is mandatory
     if len(entries) != len(policy):
-        return "Entries and policy legth doesn't match" , 400   
+        return "Entries and policy legth doesn't match" , 400  
 
     entries_string = '###'.join(str(x) for x in entries)
     policy_string = '###'.join(str(x) for x in policy)
 
-    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
+    row_id = request.json.get('id')
+    if row_id == '':
+        row_id = -1
+    else:
+        row_id = int(row_id)
+    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'), row_id=row_id)
     data_owner.cipher_data(message, entries_string, policy_string)
     return "Cipher completed", 200
 

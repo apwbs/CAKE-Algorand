@@ -114,8 +114,13 @@ def handle_client(conn, addr):
                 conn.send(b'Number to be signed: ' + str(number_to_sign).encode())
             if message[0] == "Cipher this message":
                 if check_handshake(message[4], message[5]):
-                    message_id = cipher(message)
-                    conn.send(b'Here is the message_id: ' + str(message_id).encode())
+                    message_id, ipfs_link, slices, tx_id = cipher(message)
+                    print("SlicesX: ", slices)
+                    conn.send(b'Here is the message_id: ' + str(message_id).encode() 
+                              + b"\n" + b'Here is the ipfs_link: ' + str(ipfs_link).encode()
+                              + b"\n" + b'Here are the slices: ' + str(slices).encode()
+                              + b"\n" + b'Here is the tx_id: ' + str(tx_id).encode())
+                    
     conn.close()
 
 

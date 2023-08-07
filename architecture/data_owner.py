@@ -83,6 +83,7 @@ def send(msg):
                       (process_instance_id, sender, receive[len_initial_message:]))
             connection.commit()
         if receive.startswith('Here is the message_id:'):
+            receive = receive.split('\n ')[0]
             x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, sender, receive[16:]))
             connection.commit()
 
