@@ -73,7 +73,6 @@ def main(message, entries, access_policy, sender):
     mk_bytes_encoded_64 = base64.b64encode(mk_bytes_encoded).decode('ascii')
 
     access_policy = access_policy.split('###')
-
     if len(access_policy) == 1:
         message = json.dumps(json.loads(message))
         message_ciphered = hyb_abe.encrypt(pk, message, access_policy[0])
@@ -109,11 +108,8 @@ def main(message, entries, access_policy, sender):
         print(f'ipfs hash: {hash_file}')
         os_result = os.popen('python3.10 blockchain/MessageContract/MessageContractMain.py -sender %s -app %s -message %s -hash %s' % (
             sdm_private_key, app_id_messages, message_id, hash_file))
-        print(os_result)
-        tx_id = os_result.split('Transaction id: ')[1]
-
+        tx_id = os_result.read().split('Transaction id: ')[1]
         return message_id, hash_file, [], tx_id
-
 
     else:
         now = datetime.now()

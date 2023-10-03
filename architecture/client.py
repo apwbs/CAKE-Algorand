@@ -12,12 +12,12 @@ x = connection.cursor()
 
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
-HEADER = 64
+HEADER = int(config('HEADER'))
 PORT = int(config('SKM_PORT'))
 FORMAT = 'utf-8'
 server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = config('SERVER') #
+SERVER = config('SERVER')
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
@@ -123,9 +123,6 @@ if args.generate_key or args.access_data:
     if args.generate_key:
         send("Generate my key§" + message_id + '§' + reader_address + '§' + str(signature_sending))
     if args.access_data:
-        if args.slice_id == "":
-            print("Please insert a slice ID")
-            exit()
         send("Access my data§" + message_id + '§' + slice_id + '§' + reader_address + '§' + str(signature_sending))
 
 

@@ -3,7 +3,7 @@ from flask import Flask, request
 import json
 from decouple import config
 from hashlib import sha512
-from certifier import Certifier
+from architecture.API.certifier import Certifier
 from CAKEClient import CAKEClient
 from CAKEDataOwner import CAKEDataOwner
 from flask_cors import CORS, cross_origin
@@ -122,7 +122,7 @@ def accessData():
         The status of the request, 200 if the data is accessed
     """
     reader_address, message_id, slice_id, process_id = __get_client_args__(request)
-    if reader_address == '' or message_id == '' or slice_id == '':
+    if reader_address == '' or message_id == '':
         return "Missing parameters" , 400
     client = CAKEClient(message_id=message_id, reader_address=reader_address, slice_id=slice_id, process_instance_id= process_id)
     client.access_data()
@@ -215,13 +215,7 @@ def cipher():
 
     entries_string = '###'.join(str(x) for x in entries)
     policy_string = '###'.join(str(x) for x in policy)
-
-    row_id = request.json.get('id')
-    if row_id == '':
-        row_id = -1
-    else:
-        row_id = int(row_id)
-    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'), row_id=row_id)
+    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
     data_owner.cipher_data(message, entries_string, policy_string)
     return "Cipher completed", 200
 
