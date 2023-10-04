@@ -8,84 +8,43 @@ import random
 from datetime import datetime
 import json
 import os
+import argparse
 
-'''
-def store_process_id_to_env(process_instance_id):
-    print(f'process instance id: {process_instance_id}')
-    
+def store_process_id_to_env(value):
+    name = 'PROCESS_INSTANCE_ID'
     with open('../.env', 'r', encoding='utf-8') as file:
         data = file.readlines()
-    data[0] = 'PROCESS_INSTANCE_ID=' + str(process_instance_id) + '\n'
+    edited = False
+    for line in data:
+        if line.startswith(name):
+            data.remove(line)
+            break
+    line = name + "=" + value + "\n"
+    data.append(line)
 
     with open('../.env', 'w', encoding='utf-8') as file:
         file.writelines(data)
-    print("Stored process instance id to .env file")
-    return
-'''
 
 class Certifier():
-    """ Manage the certification of the attributes of the actors
-
-    A collectio of static methods to read the public keys of the actors, 
-    the public key of the SKM and to certify the attributes of the actors
-    """
     def certify(actors, roles):
-        """ Read the public keys of actors and SKM, and certify the attributes of the actors
-
-        Read the public keys of each actor in actors, then read the public key of the SKM 
-        and certify the attributes of the actors
-
-        Args:
-            actors (list): list of actors
-            roles (dict): a dict that map each actor to a list of its roles
-
-        Returns:
-            int : process instance id
-        """
         for actor in actors:
             Certifier.__read_public_key__(actor)
         Certifier.__skm_public_key__()
         return Certifier.__attribute_certification__(roles)
 
 
-    def read_public_key(actors):
-        """ Read the public keys of each actor in actors
-        
-        Args:
-            actors (list): list of actors
-        """
+    def read_public_keys(actors):
         for actor in actors:
             Certifier.__read_public_key__(actor)
 
     def skm_public_key():
-        """ Read the public key of the SKM"""
         Certifier.__skm_public_key__()
 
     def attribute_certification(roles):
-        """ Certify the attributes of the actors
-
-        Certify the attributes of the actors on the blockchain.
-        The certification is performed by the SKM.
-
-        Args:
-            roles (dict): a dict that map each actor to a list of its roles
-        
-        Returns:
-            int : process instance id
-            
-        """
-        return Certifier.__attribute_certification__(roles)
+        Certifier.__attribute_certification__(roles)
 
 
     def __read_public_key__(actor_name):
-        """ Read the public and private key of an actor
-
-        Read the public and private key of an actor from .env and store them in a SQLite3 database
-        and on the blockchain on the PKReadersContract  
-
-        Args:
-            actor_name (str): name of the actor
-        """
         api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
         print("Reading keys of " + actor_name)
@@ -127,16 +86,11 @@ class Certifier():
                 (reader_address, hash_file, str(keyPair.n), str(keyPair.e)))
         connection.commit()
 
-        #print('private key: ' + private_key)
+        print('private key: ' + private_key)
         print(os.system('python3.10 blockchain/PublicKeysReadersContract/PKReadersContractMain.py -creator %s -app %s -ipfs %s' % (
             private_key, app_id_pk_readers, hash_file)))
 
     def __skm_public_key__():
-        """ Read the public and private key of the SKM
-
-        Read the public and private key of the SKM from .env and store them in a SQLite3 database
-        and on the blockchain on the PKSKMContract
-        """
         api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
         print("Reading keys of SKM")
@@ -174,17 +128,6 @@ class Certifier():
 
 
     def __attribute_certification__(roles):
-        """ Certify the attributes of the actors
-
-        Certify the attributes of the actors on the blockchain.
-        The certification is performed by the SKM.
-
-        Args:
-            roles (dict): a dict that map each actor to a list of its roles
-
-        Returns:
-            int : the process instance id of the certification process
-        """
 
         app_id_certifier = config('APPLICATION_ID_CERTIFIER')
 
@@ -192,10 +135,6 @@ class Certifier():
 
         app_id_certifier = config('APPLICATION_ID_CERTIFIER')
         certifier_private_key = config('CERTIFIER_PRIVATEKEY')
-
-        manufacturer_address = config('ADDRESS_MANUFACTURER')
-        supplier1_address = config('ADDRESS_SUPPLIER1')
-        supplier2_address = config('ADDRESS_SUPPLIER2')
 
         # Connection to SQLite3 attribute_certifier database
         conn = sqlite3.connect('files/attribute_certifier/attribute_certifier.db') # Connect to the database
@@ -210,7 +149,7 @@ class Certifier():
         dict_users = {}
         for actor, list_roles in roles.items():
             dict_users[config('ADDRESS_' + actor)] = [str(process_instance_id)] + [role for role in list_roles]
-        #print(dict_users)
+        print(dict_users)
 
         f = io.StringIO()
         dict_users_dumped = json.dumps(dict_users)
@@ -230,14 +169,37 @@ class Certifier():
             os.system('python3.10 blockchain/AttributeCertifierContract/AttributeCertifierContractMain.py -sender %s -app %s -process %s -hash %s' %
                     (certifier_private_key, app_id_certifier, process_instance_id, hash_file)))
         
-        #print(f'process instance id: {process_instance_id}')
-        '''
-        with open('../.env', 'r', encoding='utf-8') as file:
-            data = file.readlines()
-        data[0] = 'PROCESS_INSTANCE_ID=' + str(process_instance_id) + '\n'
+        print(f'process instance id: {process_instance_id}')
 
-        with open('../.env', 'w', encoding='utf-8') as file:
-            file.writelines(data)
-        #__store_process_id_to_env__(str(process_instance_id))
-        '''
+        store_process_id_to_env(str(process_instance_id))
         return process_instance_id
+
+    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Certifier configuration')
+    parser.add_argument('-o', '--operation', type=int, default=0,help='Operation to perform \n 0 - READ PUBLIC KEY \n 2 - READ SKM PUBLIC KEY \n 3 - CERTIFY ATTRIBUTES ')
+    parser.add_argument('-r', '--reader', type=str, default='MANUFACTURER',help='Reader name')
+    args = parser.parse_args()
+    if args.operation == 0:
+        print(args.reader)
+        Certifier.read_public_keys([args.reader])
+
+    elif args.operation == 1:
+        Certifier.skm_public_key()
+
+    elif args.operation == 2:
+        manufacturer_address = config('ADDRESS_MANUFACTURER')
+        supplier1_address = config('ADDRESS_SUPPLIER1')
+        supplier2_address = config('ADDRESS_SUPPLIER2')
+
+        roles = {
+            'MANUFACTURER': ['MANUFACTURER'],
+
+            'SUPPLIER1': ['SUPPLIER', 'ELECTRONICS'],
+
+            'SUPPLIER2': ['SUPPLIER', 'MECHANICS']
+        }
+        Certifier.attribute_certification(roles)
+    else:
+        raise Exception("Operation number not valid")    
+

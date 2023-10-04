@@ -69,7 +69,6 @@ def main(message_id, reader_address):
     getfile = getfile.split(b'####')
     attributes_dict = json.loads(getfile[1].decode('utf-8'))
     user_attr = attributes_dict[reader_address]
-
     msg_ipfs_link = retriever.retrieveMessage(app_id_messages, int(message_id))
     ciphertext_link = msg_ipfs_link[0]
     getfile1 = api.cat(ciphertext_link)
