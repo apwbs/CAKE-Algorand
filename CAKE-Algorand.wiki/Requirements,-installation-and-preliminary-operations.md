@@ -1,0 +1,120 @@
+- [Docker container](#docker-container)
+- [Install libraries](#install-libraries)
+- [Generate SSL Certificates](#generate-ssl-certificates)
+- [Set environment](#set-environment)
+
+### Docker container
+There are two ways to run the system. The first one is to download the corresponding Docker Image for the Algorand implementation stored at the [Docker Hub](https://hub.docker.com/repository/docker/apwbs/cake/general).
+
+Otherwise, it is (strongly) recommended to install Docker and create a new image running Ubuntu 18.04 and then start one
+or more containers from that image. To do this, firstly use the DockerFile running `docker build -t image_name PATH_TO_THE_DOCKERFILE/DockerFiles/`
+to create a docker image. Then run `docker run -it -v PATH_TO_CAKE-AlgorandFOLDER/CAKE-Algorand/:/CAKE-Algorand image_name`
+to create a container starting from the image created in the previous step. To run the first instance of a container run
+`docker start container_name`, then run `docker attach container_name`. To run other independent instances of the same container run
+`docker exec -it container_name bin/bash`. Running other instances (from the second on) of the same container with 
+`docker start` and `docker attach` will not make them independent. Every command in one instance will be applied also in the
+other instances. Using `docker exec` you can open as many independent containers as you like.
+
+### Install libraries
+The following libraries must be installed inside the container: python3.6, [charm](https://github.com/JHUISI/charm), 
+[rsa](https://pypi.org/project/rsa/), [web3](https://web3py.readthedocs.io/en/stable/quickstart.html) (python-version), 
+[python-decouple](https://pypi.org/project/python-decouple/), [truffle](https://trufflesuite.com/docs/truffle/how-to/install/),
+[nodejs and npm](https://nodejs.dev/en/) (recommended node version 16.19.0, npm version 8.19.3), 
+sqlite3 (`python3 -m pip install sqlite3`), ipfs (for local node) run:
+1. `python3.6 -m pip install ipfshttpclient`
+2. `wget https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_linux-amd64.tar.gz`
+3. `tar -xvzf go-ipfs_v0.7.0_linux-amd64.tar.gz`
+4. `cd go-ipfs`
+5. `sudo bash install.sh`
+6. `ipfs init`
+7. `ipfs daemon` (in another terminal window).
+
+If the installation of 'charm' fails, try running these commands: 
+1. `sudo apt-get install libgmp3-dev libssl-dev`
+2. `wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz`
+3. `tar xvf pbc-0.5.14.tar.gz`
+4. `cd pbc-0.5.14`
+5. (`sudo apt-get install flex bison` may be necessary, depending on what you already have on your system)
+6. `./configure`
+7. `make`
+8. `sudo make install`
+9. `pip install sovrin`
+
+If the installation fails again, try these commands too:
+1. `sudo apt-get git`
+2. `sudo apt-get install m4`
+3. `git clone https://github.com/JHUISI/charm.git`
+4. `cd charm`
+5. `sudo ./configure.sh`
+6. `sudo make`
+7. `sudo make install`
+8. `sudo ldconfig`
+9. `sudo -H pip install sovrin`
+
+In order to check if 'charm' is successfully installed, try run `python3` (inside the container) and then `import charm`. 
+If there are no errors displayed, the package is correctly installed.
+
+### Generate SSL Certificates
+This step consists in generating the SSL certificates necessary for the communication between the different components of the system. 
+Open the project, and create a new directory named Keys in the folder '\CAKE-Algorand\architecture'. Then, open a terminal in the same folder and run the following commands:
+
+```bash
+openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout server.key -out server.crt 
+```
+
+Fill in the requested data on the terminal, keep note of the data entered because they will have to be confirmed later during the installation, in particular the Organization Name will still have to be used.
+
+Then, run the following command and fill in the required data like before:
+
+```bash
+openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout client.key -out client.crt
+```
+
+### Set environment
+Before deploying the contracts it is necessary to create the private and public keys necessary for the process in the .`env` file, together with the network access TOKEN information. You can generate and copy a token on [PureStake](https://developer.purestake.io/).
+Then, create a file named `.env` in the folder '\CAKE-Algorand', the open the file with an editor and compile it saving your token as 'ALGOD_TOKEN' and a link to the testnet api as 'ALGOD_ADDRESS', like in the example.
+
+```python
+ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
+ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
+```
+
+Append at this list the constant 'SERVER_SNI_HOSTNAME' assigning it as value the 'Organization Name' used in the previous step. Append also the variables 'SDM_PORT' and 'SKM_PORT' assigning them respectively the numbers of the ports that you want to assign to the SDM and SKM servers. In this example we will use the ports 5050 and 5051.
+
+```python
+ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
+ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
+
+SERVER_SNI_HOSTNAME = 'LaSapienza'
+SDM_PORT = 5050
+SKM_PORT = 5051
+```
+
+Then, you have to generate the keys you need, you can proceed running `python3 account_creation.py -a` in '\CAKE-Algorand', in this way your `.env` file will be populated. Be careful because this operation can lead to the deletion of any private and public keys saved in the `.env` if it is already populated. Alternatively, you can proceed generating keys and copying manually then in `.env` build a file like in the example. To do this you have to run `python3 account_creation.py` in \CAKE-Algorand.
+
+At the end of this phase the file .env should contains these content
+
+```python
+ALGOD_TOKEN = 'YOUR_TOKEN_HERE'
+ALGOD_ADDRESS = 'https://testnet-algorand.api.purestake.io/ps2'
+
+SERVER_SNI_HOSTNAME = 'LaSapienza'
+
+CERTIFIER_ADDRESS = 'T4PMAA6ODUO3OUAKMG5SFMKYYYSZZIITXReFEXWMIEE2ED2ZIVWHNFG62Q'
+PRIVATEKEY_CERTIFIER = 'YKOWBfu7iNNPGXMSgR3jBC+BAd34Ih6RixyX9Ms7pZOjefHsADzh5dt1AKYbsisVjGJZyhE7xMUl7MQQmiD1lFbA=='
+ADDRESS_MANUFACTURER = 'S4HU4ZINJ5YHL2OBW3VM6S5HLKRSRR2XWPVDFMHGEKR5TVHV2VOFLOEWGE'
+PRIVATEKEY_MANUFACTURER = 'nmSjXkuXkHKeqTLq040L2dHcqjL4wmNNT+2ZfFjOm71XD05lDU9wdenBturPS6daoyjHV7PqMrDmIqPZ1PXVXA=='
+ADDRESS_SUPPLIER1 = 'MEDEZGMMSDFUBBWSMVDNN3HGL44SS7OPIDAC4H6SMPRWRBAXIM2SHEN3Z4'
+PRIVATEKEY_SUPPLIER1 = 'bhCjuETdIGXn8FBrx4rg3fPez0CGOVBlbDPVJl1v560hBkyZjJDLQIbSZUbW7OZfOSl9z0DALh/SY+NohBdDNQ=='
+ADDRESS_SUPPLIER2 = 'F3BSOBNOWCOO7SPNNKWWE3LHTJ2A47CLPJXXLAJ2W5IQVG5HK2GZB56AWQ'
+PRIVATEKEY_SUPPLIER2 = '8c1d0nreo+yKS6JRxTioY5729mbYnTno7LmjN+n/cCguwycFrrCc78ntaq1ibWeadA58S3pvdYE6t1EKm6dWjQ=='
+SKM_ADDRESS = 'RBA7GTS7RGTQWET7E7RBR5VRG5ZQCL5E64FTTTGQ7KE2BJRE7TURWWG424'
+SKM_PRIVATEKEY = 'jw0LpXEhtedkzgsp1TfxEctGZEFJFzKTTkUu1bdlYTCIQfNOX4mnCxJ/J+IY9rE3cwEv1PcLOczQ+omgpiT86Q=='
+SDM_ADDRESS =  'WIEBSFRLYXWE6CXYRMD2762SNQV4SWUBYI3TH4ZL3NKKVHWMT7IF5R2N3A'
+SDM_PRIVATEKEY = 'z98uZ1GxnGEITm+HuzX2HsqGxEZBCpgKnBHJJnrUSeayCBkWK8XsTwr3iwev+1JsK+lagcI3M/Mr21Sqnsyf0A=='s
+ADDRESS_CREATOR = 'PQMOY2OEGP77TSJSBJRMKHRYA2YS34GOFJMH2LVYMPVPPLQZJZNBJSTX74'
+CREATOR_PRIVATEKEY =  '3rLhwfN9Z+GkYuXSpHTd51JW1CN+eS0NwI/FriwBMGN8GOxpxDP/+ckyCmLFHjgGsS3wzipYfS32Y+r3rhlOWg=='
+PASSPHRASE_CREATOR = 'forward girl thought soccer solve debate benefit vulcano olympic spoon upgrade common protect vital valve just pizza ability side unable sun about book about that'
+```
+At the end of these phase you have to use and Algo Dispenser [like this](https://bank.testnet.algorand.network/) to get some Algo for each of your new addresses.
+

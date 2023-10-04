@@ -1,0 +1,13 @@
+**Contents**
+* [**Home**](https://github.com/MichaelPlug/CAKE-Algorand/wiki)
+* [**Requirements, installation and preliminary operations**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Requirements,-installation-and-preliminary-operations)
+* [**Run CAKE locally**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Run-CAKE-locally)
+* [**Run CAKE API**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Run-CAKE-API)
+* [**Interact using CAKE API**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Interact-using-CAKE-API)
+   * [**Create a new process**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Create-a-new-process)
+   * [**Cipher message**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Cipher-message)
+   * [**Decrypt messages**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/Decrypt-message)
+* [**API Documentation**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/API-Documentation)
+   * [**API Certification Methods**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/API-Certification-Methods)
+   * [**API DataOwner Methods**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/API-DataOwner-Methods)
+   * [**API Client Methods**](https://github.com/MichaelPlug/CAKE-Algorand/wiki/API-Client-Methods)
