@@ -1,16 +1,13 @@
 from AttributeCertifierContract import *
 from algosdk.atomic_transaction_composer import AtomicTransactionComposer
 import sys
+import argparse
 
-# sys.path.insert(0, '../')
-# from util import *
-sys.path.insert(1, 'blockchain/')
-from util import *
 
 # user declared account mnemonics
-creator_mnemonic = "infant flag husband illness gentle palace eye tilt large reopen current purity enemy depart couch moment gate transfer address diamond vital between unlock able cave"
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+creator_mnemonic = config('PASSPHRASE_CREATOR')
+algod_address = config('ALGOD_ADDRESS')
+algod_token = config('ALGOD_TOKEN')
 headers = {
     "X-API-Key": algod_token,
 }
@@ -47,7 +44,7 @@ def saveData(
 
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(client, app_id))
+    #   print("Global state:", read_global_state(client, app_id))
 
 
 def createApp(
@@ -107,30 +104,45 @@ def createApp(
     app_id = transaction.wait_for_confirmation(algod_client, result.tx_ids[0])['application-index']
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(algod_client, app_id))
+    #print("Global state:", read_global_state(algod_client, app_id))
 
     assert app_id is not None and app_id > 0
     return app_id, contract
 
 
-def main(params):
-    # sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
-    sender_private_key = params[1]
-    # sender_address = account.address_from_private_key(creator_private_key)
+def main(sender_private_key, app_id, process_id, hash_file):
 
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
 
-    # app_id, contract = createApp(algod_client, sender_private_key)
-    # print('App id: ', app_id)
-
     print("--------------------------------------------")
     print("Saving readers attributes in the application......")
-    app_id = params[2]
-    process_id = params[3]
-    hash_file = params[4]
     saveData(algod_client, sender_private_key, app_id, process_id, hash_file)
 
 
+def deploy():
+    sender_private_key = get_private_key_from_mnemonic(creator_mnemonic)
+
+    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
+
+    app_id, contract = createApp(algod_client, sender_private_key)
+    print('App id: ', app_id)
+    #print('\nSetting APPLICATION_ID_CERTIFIER=' + str(app_id) + ' in .env')
+    set_application_id('APPLICATION_ID_CERTIFIER', str(app_id))
+
 if __name__ == "__main__":
-    # main()
-    main(sys.argv)
+    #return main(sys.argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d' ,'--deploy', action='store_true')
+    parser.add_argument('-sender', '--sender_private_key', type=str, default='', help='Cerifier private key')
+    parser.add_argument('-app', '--app_id', type=str, default='', help='App id of certifier')
+    parser.add_argument('-process', '--process_id', type=str, default='', help='Process instance id')
+    parser.add_argument('-hash', '--hash_file', type=str, default='', help='')
+
+    args = parser.parse_args()
+    sys.path.insert(1, 'blockchain/')
+    sys.path.insert(0, '../')
+    from util import *
+    if args.deploy:
+        deploy()
+        exit()
+    main(args.sender_private_key, args.app_id, args.process_id, args.hash_file)

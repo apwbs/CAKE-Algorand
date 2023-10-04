@@ -1,11 +1,12 @@
 from algosdk.v2client import indexer
 import base64
 from algosdk.encoding import decode_address, encode_address
+from decouple import config
 
 indexer_address = "https://testnet-algorand.api.purestake.io/idx2"
-indexer_token = ""
+indexer_token = config('ALGOD_TOKEN')
 headers = {
-    "X-API-Key": "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+    "X-API-Key": config('ALGOD_TOKEN')
 }
 
 indexer_client = indexer.IndexerClient(indexer_token, indexer_address, headers)

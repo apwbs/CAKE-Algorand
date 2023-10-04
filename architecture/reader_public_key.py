@@ -5,10 +5,12 @@ from hashlib import sha512
 import ipfshttpclient
 import sqlite3
 import io
+import argparse
 
 api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
 
+'''
 manufacturer_address = config('ADDRESS_MANUFACTURER')
 manufacturer_private_key = config('PRIVATEKEY_MANUFACTURER')
 electronics_address = config('ADDRESS_SUPPLIER1')
@@ -18,6 +20,14 @@ mechanics_private_key = config('PRIVATEKEY_SUPPLIER2')
 
 reader_address = mechanics_address
 private_key = mechanics_private_key
+'''
+
+parser = argparse.ArgumentParser(description='Reader name')
+parser.add_argument('-r', '--reader', type=str, default='MANUFACTURER',help='Reader name')
+
+args = parser.parse_args()
+reader_address = config('ADDRESS_' + args.reader)
+private_key = config('PRIVATEKEY_' + args.reader)
 
 # Connection to SQLite3 reader database
 conn = sqlite3.connect('files/reader/reader.db')
@@ -55,9 +65,8 @@ def generate_keys():
               (reader_address, hash_file, str(keyPair.n), str(keyPair.e)))
     connection.commit()
 
-    print(os.system('python3.10 blockchain/PublicKeysReadersContract/PKReadersContractMain.py %s %s %s' % (
+    print(os.system('python3.10 blockchain/PublicKeysReadersContract/PKReadersContractMain.py -creator %s -app %s -ipfs %s' % (
         private_key, app_id_pk_readers, hash_file)))
-
-
+    
 if __name__ == "__main__":
     generate_keys()

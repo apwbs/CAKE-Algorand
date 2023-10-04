@@ -1,17 +1,16 @@
 from algosdk.atomic_transaction_composer import *
 from pyteal import *
 from algosdk import account, mnemonic
+from decouple import config
 
-creator_mnemonic = "infant flag husband illness gentle palace eye tilt large reopen current purity enemy depart couch moment gate transfer address diamond vital between unlock able cave"
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+creator_mnemonic = config('PASSPHRASE_CREATOR')
+algod_address = config('ALGOD_ADDRESS')
+algod_token = config('ALGOD_TOKEN')
 headers = {
    "X-API-Key": algod_token,
 }
 
-
 from pyteal import *
-
 
 processID = Bytes("process_id")
 IPFSLink = Bytes("ipfs_link")

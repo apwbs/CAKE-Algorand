@@ -1,16 +1,14 @@
 from PKReadersContract import *
 from algosdk.atomic_transaction_composer import AtomicTransactionComposer
 import sys
+import argparse
+from decouple import config
 
-# sys.path.insert(0, '../')
-# from util import *
-sys.path.insert(1, 'blockchain/')
-from util import *
 
 # user declared account mnemonics
-creator_mnemonic = "infant flag husband illness gentle palace eye tilt large reopen current purity enemy depart couch moment gate transfer address diamond vital between unlock able cave"
-algod_address = "https://testnet-algorand.api.purestake.io/ps2"
-algod_token = "p8IwM35NPv3nRf0LLEquJ5tmpOtcC4he7KKnJ3wE"
+creator_mnemonic = config('PASSPHRASE_CREATOR')
+algod_address = config('ALGOD_ADDRESS')
+algod_token = config('ALGOD_TOKEN')
 headers = {
     "X-API-Key": algod_token,
 }
@@ -47,7 +45,7 @@ def saveData(
 
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(client, app_id))
+    #print("Global state:", read_global_state(client, app_id))
 
 
 def createApp(
@@ -107,31 +105,46 @@ def createApp(
     app_id = transaction.wait_for_confirmation(algod_client, result.tx_ids[0])['application-index']
     print("Transaction id:", result.tx_ids[0])
 
-    print("Global state:", read_global_state(algod_client, app_id))
+    #print("Global state:", read_global_state(algod_client, app_id))
 
     assert app_id is not None and app_id > 0
     return app_id, contract
 
 
-def main(params):
-    # creator_private_key = get_private_key_from_mnemonic(creator_mnemonic)
-    creator_private_key = params[1]
-    creator_address = account.address_from_private_key(creator_private_key)
-    # print(creator_address)
 
+def deploy():
+    creator_private_key = get_private_key_from_mnemonic(creator_mnemonic)
     algod_client = algod.AlgodClient(algod_token, algod_address, headers)
 
-    # app_id, contract = createApp(algod_client, creator_private_key)
-    # print('App id: ', app_id)
+    app_id, _ = createApp(algod_client, creator_private_key)
+    print('App id: ', app_id)
+    #print('Set APPLICATION_ID_PK_READERS = ' + str(app_id) + ' in .env'))
+    set_application_id('APPLICATION_ID_PK_READERS', app_id)
 
+
+def main(creator_private_key, app_id, ipfs_link):
+    creator_address = account.address_from_private_key(creator_private_key)
+
+    algod_client = algod.AlgodClient(algod_token, algod_address, headers)
     print("--------------------------------------------")
-    print("Saving elements of an authority in the application......")
-    app_id = params[2]
-    ipfs_link = params[3]
+    print("Saving message in the application......")
+
     saveData(algod_client, creator_private_key, app_id, creator_address, ipfs_link)
 
-
 if __name__ == "__main__":
-    # main()
-    main(sys.argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d' ,'--deploy', action='store_true')
+    parser.add_argument('-creator', '--creator_private_key', type=str, default='', help='Sender private key')
+    parser.add_argument('-app', '--app_id', type=str, default='', help='App id of the contract')
+    parser.add_argument('-ipfs', '--ipfs_link', type=str, default='', help='')
+
+
+    args = parser.parse_args()
+    sys.path.insert(1, 'blockchain/')
+    sys.path.insert(0, '../')
+    from util import *
+    if args.deploy:
+        deploy()
+        exit()
     
+    main(args.creator_private_key, args.app_id, args.ipfs_link)

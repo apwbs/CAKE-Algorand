@@ -5,6 +5,7 @@ import sqlite3
 import json
 from decouple import config
 import sqlite3
+import argparse
 
 ## PENSO SIA DA TOGLIERE
 # # Connection to SQLite3 reader database
@@ -12,13 +13,14 @@ import sqlite3
 # x = connection.cursor()
 
 process_instance_id = config('PROCESS_INSTANCE_ID')
+#print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
-PORT = 5051
+PORT = int(config('SDM_PORT'))
 FORMAT = 'utf-8'
-server_sni_hostname = 'example.com'
+server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "172.17.0.2"
+SERVER = config('SERVER') #"172.17.0.2"
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
@@ -71,17 +73,17 @@ def send(msg):
     send_length = str(msg_length).encode(FORMAT)
     send_length += b' ' * (HEADER - len(send_length))
     conn.send(send_length)
-    # print(send_length)
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
+    #print(receive)
     if len(receive) != 0:
-
-        if receive[:15] == 'Number to sign:':
+        if receive.startswith('Number to be signed: '):
+            len_initial_message = len('Number to be signed: ')
             x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?)",
-                      (process_instance_id, sender, receive[16:]))
+                      (process_instance_id, sender, receive[len_initial_message:]))
             connection.commit()
-
-        if receive[:23] == 'Here is the message_id:':
+        if receive.startswith('Here is the message_id:'):
+            receive = receive.split('\n ')[0]
             x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, sender, receive[16:]))
             connection.commit()
 
@@ -96,9 +98,10 @@ message_to_send = g.read()
 entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
 entries_string = '###'.join(str(x) for x in entries)
 
-policy = ['1604423002081035210 and (MANUFACTURER or SUPPLIER)',
-          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-          '1604423002081035210 and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+
+policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
 policy_string = '###'.join(policy)
 
 # data = json.load(f)
@@ -111,11 +114,16 @@ policy_string = '###'.join(policy)
 
 sender = manufacturer_address
 
-# send("Start handshake||" + sender)
+parser = argparse.ArgumentParser()
+parser.add_argument('-hs' ,'--hanshake', action='store_true')
+parser.add_argument('-c','--cipher', action='store_true')
 
-signature_sending = sign_number()
+args = parser.parse_args()
+if args.hanshake:
+    send("Start handshake§" + sender)
 
-send("Cipher this message||" + message_to_send + '||' + entries_string + '||' + policy_string + '||' +
-     sender + '||' + str(signature_sending))
+if args.cipher:
+    signature_sending = sign_number()
+    send("Cipher this message§" + message_to_send + '§' + entries_string + '§' + policy_string + '§' + sender + '§' + str(signature_sending))
 
 send(DISCONNECT_MESSAGE)

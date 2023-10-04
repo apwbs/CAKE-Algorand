@@ -36,9 +36,8 @@ def generate_keys():
     x.execute("INSERT OR IGNORE INTO rsa_public_key VALUES (?,?,?)", (skm_address, hash_file, publicKey_store))
     conn.commit()
 
-    print(os.system('python3.10 blockchain/PublicKeySKM/PKSKMContractMain.py %s %s %s' % (
+    print(os.system('python3.10 blockchain/PublicKeySKM/PKSKMContractMain.py -creator %s -app %s -ipfs %s' % (
         skm_private_key, app_id_pk_skm, hash_file)))
-
 
 if __name__ == "__main__":
     generate_keys()
