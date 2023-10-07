@@ -95,14 +95,14 @@ g = open('files/data.json')
 
 message_to_send = g.read()
 
-"""
-dictionary = json.loads(message_to_send)
-size_in_bytes = 20971520  # 20MB
-random_string = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size_in_bytes))
-dictionary['ID'] = random_string
-string_dict = json.dumps(dictionary)
-message_to_send = string_dict
-"""
+# START OF TEST TO CHECK LONG MESSAGES: 20MB IN THIS CASE
+# dictionary = json.loads(message_to_send)
+# size_in_bytes = 20971520  # 20MB
+# random_string = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size_in_bytes))
+# dictionary['ID'] = random_string
+# string_dict = json.dumps(dictionary)
+# message_to_send = string_dict
+# END OF TEST
 
 # policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
 
