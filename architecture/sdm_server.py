@@ -26,8 +26,6 @@ ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
-chunk_size = 16384
-
 """
 creation and connection of the secure channel using SSL protocol
 """
@@ -95,8 +93,11 @@ function that handles the requests from the clients. There is only one request p
 ciphering of a message with a policy.
 """
 
+
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
+
+    chunk_size = 16384
     connected = True
     while connected:
         msg_length = conn.recv(HEADER).decode(FORMAT)
@@ -117,6 +118,7 @@ def handle_client(conn, addr):
             if message[0] == "Cipher this message":
                 if check_handshake(message[4], message[5]):
                     message_id, ipfs_link, slices, tx_id = cipher(message)
+                    print("SlicesX: ", slices)
                     conn.send(b'Here is the message_id: ' + str(message_id).encode() 
                               + b"\n" + b'Here is the ipfs_link: ' + str(ipfs_link).encode()
                               + b"\n" + b'Here are the slices: ' + str(slices).encode()
@@ -132,7 +134,7 @@ main function starting the server. It listens on a port and waits for a request 
 
 def start():
     bindsocket.listen()
-    print(f"[LISTENING] Server is listeningx     on {SERVER}")
+    print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         newsocket, fromaddr = bindsocket.accept()
         conn = context.wrap_socket(newsocket, server_side=True)

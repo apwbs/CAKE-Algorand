@@ -112,5 +112,4 @@ def main(message_id, slice_id, reader_address):
 
         mdec = hyb_abe.decrypt(pk, sk, message)
         saltdec = hyb_abe.decrypt(pk, sk, salt)
-
         return mdec, saltdec

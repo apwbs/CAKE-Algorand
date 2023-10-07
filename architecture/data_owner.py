@@ -1,5 +1,6 @@
 import socket
 import ssl
+import sys
 from hashlib import sha512
 import sqlite3
 import json
@@ -13,14 +14,14 @@ import argparse
 # x = connection.cursor()
 
 process_instance_id = config('PROCESS_INSTANCE_ID')
-#print("process_instance_id: " + process_instance_id + "\n\n")
+# print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
-PORT = int(config('SDM_PORT'))
+PORT = 5053
 FORMAT = 'utf-8'
 server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = config('SERVER') #"172.17.0.2"
+SERVER = "10.181.120.137"
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
@@ -75,7 +76,7 @@ def send(msg):
     conn.send(send_length)
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
-    #print(receive)
+    # print(receive)
     if len(receive) != 0:
         if receive.startswith('Number to be signed: '):
             len_initial_message = len('Number to be signed: ')
@@ -83,8 +84,7 @@ def send(msg):
                       (process_instance_id, sender, receive[len_initial_message:]))
             connection.commit()
         if receive.startswith('Here is the message_id:'):
-            receive = receive.split('\n ')[0]
-            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, sender, receive[16:]))
+            x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (process_instance_id, receive[24:], sender))
             connection.commit()
 
 
@@ -97,7 +97,6 @@ message_to_send = g.read()
 
 entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
 entries_string = '###'.join(str(x) for x in entries)
-
 
 policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
           process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
@@ -115,15 +114,17 @@ policy_string = '###'.join(policy)
 sender = manufacturer_address
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-hs' ,'--hanshake', action='store_true')
-parser.add_argument('-c','--cipher', action='store_true')
+parser.add_argument('-hs', '--handshake', action='store_true')
+parser.add_argument('-c', '--cipher', action='store_true')
 
 args = parser.parse_args()
-if args.hanshake:
+if args.handshake:
     send("Start handshake§" + sender)
 
 if args.cipher:
     signature_sending = sign_number()
-    send("Cipher this message§" + message_to_send + '§' + entries_string + '§' + policy_string + '§' + sender + '§' + str(signature_sending))
+    send(
+        "Cipher this message§" + message_to_send + '§' + entries_string + '§' + policy_string + '§' + sender + '§' + str(
+            signature_sending))
 
 send(DISCONNECT_MESSAGE)
