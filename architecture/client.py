@@ -54,7 +54,6 @@ def sign_number(message_id):
     return signature
 
 
-
 """
 function to handle the sending and receiving messages.
 """
@@ -68,11 +67,11 @@ def send(msg):
     conn.send(send_length)
     conn.send(message)
     receive = conn.recv(6000).decode(FORMAT)
-    #print(receive)
+    # print(receive)
     if receive.startswith('Number to be signed: '):
         len_initial_message = len('Number to be signed: ')
         x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
-                    (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
+                  (process_instance_id, message_id, reader_address, receive[len_initial_message:]))
         connection.commit()
 
     if receive.startswith('Here are the IPFS link and key'):
@@ -80,7 +79,7 @@ def send(msg):
         ipfs_link = receive.split('\n\n')[1]
 
         x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                    (process_instance_id, message_id, reader_address, ipfs_link, key))
+                  (process_instance_id, message_id, reader_address, ipfs_link, key))
         connection.commit()
 
     if receive.startswith('Here are the plaintext and salt'):
@@ -88,19 +87,21 @@ def send(msg):
         salt = receive.split('\n\n')[1]
 
         x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
-                    (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
+                  (process_instance_id, message_id, slice_id, reader_address, plaintext, salt))
         connection.commit()
         print("Plaintext: " + plaintext)
 
-parser = argparse.ArgumentParser(description="Client request details", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser = argparse.ArgumentParser(description="Client request details",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-m', '--message_id', type=str, default="", help='Message ID')
 parser.add_argument('-s', '--slice_id', type=str, default="", help='Slice ID')
 parser.add_argument('-rd', '--reader_address', type=str, default="", help='Reader address')
 
-#TODO: add the other arguments
+# TODO: add the other arguments
 parser.add_argument('-hs', '--handshake', action='store_true', help='Handshake')
 parser.add_argument('-gs', '--generate_key', action='store_true', help='Generate key')
-parser.add_argument('-ad','--access_data',  action='store_true', help='Access data')
+parser.add_argument('-ad', '--access_data', action='store_true', help='Access data')
 args = parser.parse_args()
 
 message_id = args.message_id
@@ -111,20 +112,19 @@ if args.message_id == "":
     print("Please insert a message ID")
     exit()
 
-if args.reader_address == "": 
+if args.reader_address == "":
     print("Please insert a reader address")
     exit()
 
 if args.handshake:
-    send("Start handshake§" + str(message_id) + '§' + reader_address) #and exit()
+    send("Start handshake§" + str(message_id) + '§' + reader_address)  # and exit()
 
-if args.generate_key or args.access_data:   
+if args.generate_key or args.access_data:
     signature_sending = sign_number(message_id)
     if args.generate_key:
         send("Generate my key§" + message_id + '§' + reader_address + '§' + str(signature_sending))
     if args.access_data:
         send("Access my data§" + message_id + '§' + slice_id + '§' + reader_address + '§' + str(signature_sending))
-
 
 # exit()
 send(DISCONNECT_MESSAGE)

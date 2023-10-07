@@ -4,6 +4,8 @@ import sys
 from hashlib import sha512
 import sqlite3
 import json
+import string
+import random
 from decouple import config
 import sqlite3
 import argparse
@@ -17,11 +19,11 @@ process_instance_id = config('PROCESS_INSTANCE_ID')
 # print("process_instance_id: " + process_instance_id + "\n\n")
 
 HEADER = 64
-PORT = 5053
+PORT = 5054
 FORMAT = 'utf-8'
 server_sni_hostname = config('SERVER_SNI_HOSTNAME')
 DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "10.181.120.137"
+SERVER = "192.168.0.240"
 ADDR = (SERVER, PORT)
 server_cert = 'Keys/server.crt'
 client_cert = 'Keys/client.crt'
@@ -92,6 +94,15 @@ def send(msg):
 g = open('files/data.json')
 
 message_to_send = g.read()
+
+"""
+dictionary = json.loads(message_to_send)
+size_in_bytes = 20971520  # 20MB
+random_string = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size_in_bytes))
+dictionary['ID'] = random_string
+string_dict = json.dumps(dictionary)
+message_to_send = string_dict
+"""
 
 # policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
 
