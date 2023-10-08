@@ -3,6 +3,7 @@ import socket
 import ssl
 import threading
 import cipher_message
+import cipher_files
 from datetime import datetime
 import random
 import sqlite3
@@ -44,6 +45,10 @@ function triggered by the client handler. Here starts the ciphering of the messa
 
 def cipher(message):
     return cipher_message.main(message[1], message[2], message[3], message[4])
+
+
+def cipher_plus(message):
+    return cipher_files.main(message[1], message[2], message[3])
 
 
 def generate_number_to_sign(reader_address):
@@ -120,6 +125,14 @@ def handle_client(conn, addr):
                     message_id, ipfs_link, slices, tx_id = cipher(message)
                     print("SlicesX: ", slices)
                     conn.send(b'Here is the message_id: ' + str(message_id).encode() 
+                              + b"\n" + b'Here is the ipfs_link: ' + str(ipfs_link).encode()
+                              + b"\n" + b'Here are the slices: ' + str(slices).encode()
+                              + b"\n" + b'Here is the tx_id: ' + str(tx_id).encode())
+            if message[0] == "Cipher these files":
+                if check_handshake(message[3], message[4]):
+                    message_id, ipfs_link, slices, tx_id = cipher_plus(message)
+                    print("SlicesX: ", slices)
+                    conn.send(b'Here is the message_id: ' + str(message_id).encode()
                               + b"\n" + b'Here is the ipfs_link: ' + str(ipfs_link).encode()
                               + b"\n" + b'Here are the slices: ' + str(slices).encode()
                               + b"\n" + b'Here is the tx_id: ' + str(tx_id).encode())
