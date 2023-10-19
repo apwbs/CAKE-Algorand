@@ -77,14 +77,17 @@ def main(message, access_policy, sender):
     now = datetime.now()
     now = int(now.strftime("%Y%m%d%H%M%S%f"))
     random.seed(now)
+
     message_dict = json.loads(message)
 
     metadata_list = []
     ciphered_message_list = []
+    final_slices = []
     for i, entry in enumerate(message_dict):
         ciphered_message = {}
 
         slice_id = random.randint(1, 2 ** 64)
+        final_slices.append(slice_id)
         print(f'slice id: {slice_id}')
 
         cipher_field = hyb_abe.encrypt(pk, entry, access_policy[i])
@@ -108,7 +111,7 @@ def main(message, access_policy, sender):
         s_1_hashed = hashlib.sha256(s_1)
         hex_dig = s_1_hashed.hexdigest()
 
-        metadata = {'slice_id': slice_id, 'message_with_salt': hex_dig, 'salt': salt_with_policy_bytes_64}
+        metadata = {'slice_id': slice_id, 'message_with_salt': hex_dig, 'salt': salt_with_policy_bytes_64, 'file': cipher_field_bytes_64}
         metadata_list.append(metadata)
 
     message_id = random.randint(1, 2 ** 64)
@@ -120,7 +123,6 @@ def main(message, access_policy, sender):
 
     with open('files/more_files.json', 'w') as u1:
         u1.write(json.dumps(final_message))
-    exit()
 
     hash_file = api.add_json(final_message)
     print(f'ipfs hash: {hash_file}')
@@ -129,5 +131,5 @@ def main(message, access_policy, sender):
         sdm_private_key, app_id_messages, message_id, hash_file)).read()
     print(os_result)
     tx_id = os_result.split('Transaction id: ')[1]
-    return message_id, hash_file, tx_id
+    return message_id, hash_file, final_slices, tx_id
 
