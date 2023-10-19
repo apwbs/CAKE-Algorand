@@ -73,11 +73,10 @@ def receive_message(conn):
     message = ""
     while True:
         data = conn.recv(1024).decode(FORMAT)  # Receive data in chunks of 1024 bytes
-        if not data:  # No data received
+        if not data:
             break
         message += data
 
-        # Check if the end of the message is reached
         if message.endswith("Msg received!"):
             return message
         elif message.endswith("Number to be signed:"):
@@ -98,8 +97,6 @@ def send(msg):
     conn.send(send_length)
     conn.send(message)
     receive = receive_message(conn)
-    # print(receive)
-    # exit()
     if receive.startswith('Number to be signed: '):
         len_initial_message = len('Number to be signed: ')
         x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
@@ -109,9 +106,10 @@ def send(msg):
     if receive.startswith('Here are the IPFS link and key'):
         key = receive.split('\n\n')[0].split("b'")[1].rstrip("'")
         ipfs_link = receive.split('\n\n')[1]
+        ipfs_link = ipfs_link[:-13]
 
         x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                  (process_instance_id, message_id, reader_address, ipfs_link[:-13], key))
+                  (process_instance_id, message_id, reader_address, ipfs_link, key))
         connection.commit()
 
     if receive.startswith('Here are the plaintext and salt'):
@@ -140,7 +138,6 @@ def send(msg):
         x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
                   (process_instance_id, message_id, slice_id, reader_address, plaintext_file, salt))
         connection.commit()
-        # print("Plaintext: " + plaintext)
 
 
 parser = argparse.ArgumentParser(description="Client request details",
