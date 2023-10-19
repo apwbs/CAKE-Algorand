@@ -16,7 +16,7 @@ api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
 process_instance_id = config('PROCESS_INSTANCE_ID')
 
-HEADER = 64
+HEADER = int(config('HEADER'))
 PORT = int(config('SKM_PORT'))
 server_cert = 'Keys/server.crt'
 server_key = 'Keys/server.key'
