@@ -1,8 +1,11 @@
 import socket
 import ssl
+import sys
 from hashlib import sha512
 import sqlite3
 import json
+import string
+import random
 from decouple import config
 import sqlite3
 import argparse
@@ -50,7 +53,6 @@ class CAKEDataOwner(Connector):
             self.connection.commit()
         if receive.startswith('Here is the message_id: '):
             received_messages =receive.split('\n')
-            #print("received message: ", received_messages)
             len_initial_message = len('Here is the message_id: ')
             self.x.execute("INSERT OR IGNORE INTO messages VALUES (?,?,?)", (self.process_instance_id, self.manufacturer_address, received_messages[0][len_initial_message:]))
             self.connection.commit()
@@ -102,6 +104,13 @@ if __name__ == "__main__":
 
     # policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
 
+entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
+entries_string = '###'.join(str(x) for x in entries)
+
+policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
+          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
+policy_string = '###'.join(policy)
     entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
     entries_string = '###'.join(str(x) for x in entries)
     #print(entries_string)

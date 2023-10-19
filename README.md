@@ -5,5 +5,3 @@ Collaborative Process Execution on Blockchain](https://arxiv.org/abs/2207.08484)
 
 In this [Docker Hub repository](https://hub.docker.com/repository/docker/apwbs/cake/general) there are the two Docker Images 
 for the Ethereum and Algorand implementation of the CAKE approach.
-
-More information on the project, its requirements and a step-by-step guide to its use are contained within the [Wiki](https://github.com/MichaelPlug/CAKE-Algorand/wiki).

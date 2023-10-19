@@ -48,6 +48,15 @@ class HybridABEnc(ABEnc):
 """
 
 
+def base64_to_file(encoded_data, output_file_path):
+    try:
+        decoded_data = base64.b64decode(encoded_data.encode('utf-8'))
+        with open(output_file_path, 'wb') as file:
+            file.write(decoded_data)
+    except Exception as e:
+        print(f"Error decoding Base64 to file: {e}")
+
+
 def main(message_id, slice_id, reader_address):
     # Connection to SQLite3 skm database
     conn = sqlite3.connect('files/skm/skm.db')
@@ -68,16 +77,14 @@ def main(message_id, slice_id, reader_address):
     pk = base64.b64decode(pk)
     pk = bytesToObject(pk, groupObj)
 
+    output_folder = "files/prova/"
+    output_files = {}
     if int(slice_id) != 0:
-        body = json.loads(j2['body'])
-        for i, elem in enumerate(body):
-            slice_number = body[i][0][0][0]
+        metadata = j2['metadata']
+        for i, elem in enumerate(metadata):
+            slice_number = metadata[i]['slice_id']
             if slice_number == int(slice_id):
-                message = body[i][1]
-                message = base64.b64decode(message)
-                message = bytesToObject(message, groupObj)
-
-                salt = body[i][0][0][2]
+                salt = metadata[i]['salt']
                 salt = base64.b64decode(salt)
                 salt = bytesToObject(salt, groupObj)
 
@@ -88,12 +95,29 @@ def main(message_id, slice_id, reader_address):
                 sk = result[0][4]
                 sk = bytesToObject(sk, groupObj)
 
-                mdec = hyb_abe.decrypt(pk, sk, message)
-                saltdec = hyb_abe.decrypt(pk, sk, salt)
+                encoded_file = metadata[i]['file']
+                file = base64.b64decode(encoded_file)
+                file = bytesToObject(file, groupObj)
 
-                return mdec, saltdec
+                decoded_file = hyb_abe.decrypt(pk, sk, file)
+                decoded_file = decoded_file.decode('utf-8')
+
+                var = j2['body'][0][encoded_file]
+                var = base64.b64decode(var)
+                var = bytesToObject(var, groupObj)
+                mdec = hyb_abe.decrypt(pk, sk, var)
+                mdec = mdec.decode('utf-8')
+                output_files[decoded_file] = mdec
+                for filename, encoded_data in output_files.items():
+                    base64_to_file(encoded_data, output_folder + filename)
+
+                saltdec = hyb_abe.decrypt(pk, sk, salt)
+                print(mdec)
+                output_files_bytes = json.dumps(output_files, indent=2).encode('utf-8')
+
+                return output_files_bytes, saltdec
     else:
-        body = json.loads(j2['body'])
+        metadata = json.loads(j2['metadata'])
 
         message = body[0][1]
         message = base64.b64decode(message)

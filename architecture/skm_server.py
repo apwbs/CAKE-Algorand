@@ -8,6 +8,7 @@ import random
 import sqlite3
 from hashlib import sha512
 import retriever
+import decipher_files
 from decouple import config
 import ipfshttpclient
 
@@ -45,6 +46,10 @@ def generate(message_id, reader_address):
 
 def read(message_id, slice_id, reader_address):
     return decipher_message.main(message_id, slice_id, reader_address)
+
+
+def read_files(message_id, slice_id, reader_address):
+    return decipher_files.main(message_id, slice_id, reader_address)
 
 
 def generate_number_to_sign(message_id, reader_address):
@@ -113,11 +118,17 @@ def handle_client(conn, addr):
                     response = generate(message[1], message[2])
                     response_0 = bytes(str(response[0]), FORMAT)
                     response_1 = bytes(str(response[1]), FORMAT)
+                    print(response_0)
+                    print(response_1)
                     conn.send(b'Here are the IPFS link and key: ' + response_0 + b'\n\n' + response_1)
             if message[0] == "Access my data":
                 if check_handshake(message[1], message[3], message[4]):
                     response = read(message[1], message[2], message[3])
                     conn.send(b'Here are the plaintext and salt: ' + response[0] + b'\n\n' + response[1])
+            if message[0] == "Access my files":
+                if check_handshake(message[1], message[3], message[4]):
+                    response = read_files(message[1], message[2], message[3])
+                    conn.send(b'Here is the file and salt: ' + response[0] + b'\n\n' + response[1])
 
     conn.close()
 

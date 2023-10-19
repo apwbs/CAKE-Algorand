@@ -6,6 +6,15 @@ from decouple import config
 import sqlite3
 import argparse
 from connector import Connector
+import base64
+
+def base64_to_file(encoded_data, output_file_path):
+    try:
+        decoded_data = base64.b64decode(encoded_data.encode('utf-8'))
+        with open(output_file_path, 'wb') as file:
+            file.write(decoded_data)
+    except Exception as e:
+        print(f"Error decoding Base64 to file: {e}")
 
 class CAKEClient(Connector):
     """A client to communicate with the CAKE SKM server
@@ -46,6 +55,27 @@ class CAKEClient(Connector):
         self.slice_id = slice_id
         return
 
+
+    def __receive_message__(self):
+        message = ""
+        while True:
+            data = self.conn.recv(1024).decode(self.FORMAT)  # Receive data in chunks of 1024 bytes
+            if not data:  # No data received
+                break
+            message += data
+
+            # Check if the end of the message is reached
+            if message.endswith("Msg received!"):
+                return message
+            elif message.endswith("Number to be signed:"):
+                return message
+            elif message.endswith("Here are the IPFS link and key:"):
+                return message
+            elif message.endswith("Here are the plaintext and salt:"):
+                return message
+            elif message.endswith("Here is the file and salt:"):
+                return message
+
     def send(self, msg):
         """Send a message to the CAKE SKM server
 
@@ -60,12 +90,12 @@ class CAKEClient(Connector):
         send_length += b' ' * (self.HEADER - len(send_length))
         self.conn.send(send_length)
         self.conn.send(message)
-        receive = self.conn.recv(6000).decode(self.FORMAT)
+        receive = self.receive_message()
         #print(receive)
         if receive.startswith('Number to be signed:'):
             len_initial_message = len('Number to be signed: ')
             self.x.execute("INSERT OR IGNORE INTO handshake_number VALUES (?,?,?,?)",
-                    (self.process_instance_id, self.message_id, self.reader_address, receive[len_initial_message:]))
+                    (self.process_instance_id, self.message_id, self.reader_address, receive[len_initial_message:-13]))
             self.connection.commit()
 
         if receive.startswith('Here are the IPFS link and key'):
@@ -73,7 +103,7 @@ class CAKEClient(Connector):
             ipfs_link = receive.split('\n\n')[1]
 
             self.x.execute("INSERT OR IGNORE INTO decription_keys VALUES (?,?,?,?,?)",
-                    (self.process_instance_id, self.message_id, self.reader_address, ipfs_link, key))
+                    (self.process_instance_id, self.message_id, self.reader_address, ipfs_link[:-13], key))
             self.connection.commit()
 
         if  receive.startswith('Here are the plaintext and salt'):
@@ -84,6 +114,22 @@ class CAKEClient(Connector):
                     (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext, salt))
             self.connection.commit()
             print("Plaintext: ", plaintext)
+        if receive.startswith('Here is the file and salt'):
+            plaintext = receive.split('\n\n')[0].split('Here is the file and salt: ')[1]
+            plaintext_value = json.loads(len_initial_message)
+            plaintext_file = list(plaintext_value.items())[0][1]
+
+            salt = receive.split('\n\n')[1]
+            salt = salt[:-13]
+
+            output_folder = "files/prova/"
+            filename = list(plaintext_value.items())[0][0]
+            base64_to_file(plaintext_file, output_folder + filename)
+
+            self.x.execute("INSERT OR IGNORE INTO plaintext VALUES (?,?,?,?,?,?)",
+                    (self.process_instance_id, self.message_id, self.slice_id, self.reader_address, plaintext_file, salt))
+            self.connection.commit()
+
         return 
     
     def handshake(self):
@@ -104,7 +150,12 @@ class CAKEClient(Connector):
         signature_sending = self.sign_number()
         self.send("Access my data§" + self.message_id + '§' + self.slice_id + '§' + self.reader_address + '§' + str(signature_sending))
         self.disconnect()
-        
+    
+    def accesss_file(self):
+        """Access the files of the reader"""
+        signature_sending = self.sign_number()
+        self.send("Access my files§" + message_id + '§' + slice_id + '§' + reader_address + '§' + str(signature_sending))
+        self.disconnect()
 
     def sign_number(self):
         """Sign a number 
@@ -131,10 +182,11 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--slice_id', type=str, default=slice_id, help='Slice ID')
     parser.add_argument('-rd', '--reader_address', type=str, default=reader_address, help='Reader address')
 
-    #TODO: add the other arguments
     parser.add_argument('-hs', '--handshake', action='store_true', help='Handshake')
     parser.add_argument('-gs', '--generate_key', action='store_true', help='Generate key')
     parser.add_argument('-ad','--access_data',  action='store_true', help='Access data')
+    parser.add_argument('-af', '--access_files', action='store_true', help='Access files')
+
     args = parser.parse_args()
 
     message_id = args.message_id
@@ -148,8 +200,10 @@ if __name__ == "__main__":
     client = CAKEClient(message_id=message_id, reader_address=reader_address, slice_id=slice_id)
     if args.handshake:
         client.handshake()
-    if args.generate_key or args.access_data:
+    if args.generate_key or args.access_data or args.access_files:
         if args.generate_key:
             client.generate_key()
         if args.access_data:
             client.access_data()
+        elif args.access_files:
+            client.access_files()
