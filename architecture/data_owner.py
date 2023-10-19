@@ -92,6 +92,7 @@ class CAKEDataOwner(Connector):
         number_to_sign = result[0][2]
         return super().sign_number(number_to_sign, self.manufacturer_address)
 
+
 if __name__ == "__main__":
     NO_SLICE = False
     # f = open('files/data.json')
@@ -103,14 +104,6 @@ if __name__ == "__main__":
     message_to_send = g.read()
 
     # policy_string = '1604423002081035210 and (MANUFACTURER or (SUPPLIER and ELECTRONICS))'
-
-entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
-entries_string = '###'.join(str(x) for x in entries)
-
-policy = [process_instance_id + ' and (MANUFACTURER or SUPPLIER)',
-          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and ELECTRONICS))',
-          process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
-policy_string = '###'.join(policy)
     entries = [['ID', 'SortAs', 'GlossTerm'], ['Acronym', 'Abbrev'], ['Specs', 'Dates']]
     entries_string = '###'.join(str(x) for x in entries)
     #print(entries_string)
@@ -119,7 +112,6 @@ policy_string = '###'.join(policy)
             process_instance_id + ' and (MANUFACTURER or (SUPPLIER and MECHANICS))']
 
     policy_string = '###'.join(policy)
-
     if NO_SLICE:
         data = json.load(open('files/data.json'))
         entries = [list(data.keys())]
@@ -139,6 +131,5 @@ policy_string = '###'.join(policy)
     args = parser.parse_args()
     if args.hanshake:
         dataOwner.handshake()
-
     if args.cipher:
         dataOwner.cipher_data(message_to_send, entries_string, policy_string)

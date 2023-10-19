@@ -90,7 +90,7 @@ class CAKEClient(Connector):
         send_length += b' ' * (self.HEADER - len(send_length))
         self.conn.send(send_length)
         self.conn.send(message)
-        receive = self.receive_message()
+        receive = self.__receive_message__()
         #print(receive)
         if receive.startswith('Number to be signed:'):
             len_initial_message = len('Number to be signed: ')
@@ -169,6 +169,7 @@ class CAKEClient(Connector):
         self.x.execute("SELECT * FROM handshake_number WHERE process_instance=? AND message_id=? AND reader_address=?",
                     (self.process_instance_id, self.message_id, self.reader_address))
         result = self.x.fetchall()
+        print("Result handshake number: ", result)
         number_to_sign = result[0][3]
         return super().sign_number(number_to_sign, self.reader_address)    
     

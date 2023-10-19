@@ -48,7 +48,7 @@ class Connector:
         self.FORMAT = 'utf-8'
         self.server_sni_hostname = config('SERVER_SNI_HOSTNAME')
         self.DISCONNECT_MESSAGE = "!DISCONNECT"
-        self.SERVER = "192.168.0.240"
+        self.SERVER = config('SERVER')
         self.ADDR = (self.SERVER, self.PORT)
 
         # Set up SSL parameters

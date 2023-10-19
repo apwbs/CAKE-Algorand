@@ -12,6 +12,8 @@ import retriever
 from decouple import config
 import ipfshttpclient
 
+chunk_size = 16384
+
 api = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
 
 app_id_pk_readers = config('APPLICATION_ID_PK_READERS')
@@ -101,8 +103,6 @@ ciphering of a message with a policy.
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
-
-    chunk_size = 16384
     connected = True
     while connected:
         msg_length = conn.recv(HEADER).decode(FORMAT)
