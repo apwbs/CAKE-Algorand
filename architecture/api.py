@@ -3,9 +3,9 @@ from flask import Flask, request
 import json
 from decouple import config
 from hashlib import sha512
-from architecture.API.certifier import Certifier
-from CAKEClient import CAKEClient
-from CAKEDataOwner import CAKEDataOwner
+from certifier import Certifier
+from client import CAKEClient
+from data_owner import CAKEDataOwner
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -130,37 +130,6 @@ def accessData():
 
     return "Data accessed" , 200
 
-'''
-@app.route('/client/fullrequest/' , methods=['GET', 'POST'])
-def client_fullrequest():
-    """ Request to the SKM Server to send a request of handshake, generate key and access data
-
-        This function is used to send a request to the SKM Server
-        to make an handshake, generate a key and access data.
-        
-        Args:
-            reader_address: the address of the reader
-            message_id: the id of the message
-            slice_id: the id of the slice
-            process_id: the id of the process (process_instance_id)
-            
-        Returns:
-            The status of the request, 200 if all the operations are completed
-    """
-    reader_address, message_id, slice_id, process_id = __get_client_args__(request)
-    if reader_address == '' or message_id == '' or slice_id == '':
-        return "Missing parameters" , 400
-    client = CAKEClient(message_id=message_id, reader_address=reader_address, slice_id=slice_id, process_instance_id= process_id)
-    client.handshake()
-    print("Handshake launched")
-    client = CAKEClient(message_id=message_id, reader_address=reader_address, slice_id=slice_id, process_instance_id= process_id)
-    client.generate_key()
-    print("Key generation launched")    
-    client = CAKEClient(message_id=message_id, reader_address=reader_address, slice_id=slice_id, process_instance_id= process_id)
-    client.access_data()
-    print("Data access launched")
-    return "Handshake completed", 200
-'''
 
 ##### Request from Data Owner to SDM Server #####
 
@@ -218,48 +187,6 @@ def cipher():
     data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
     data_owner.cipher_data(message, entries_string, policy_string)
     return "Cipher completed", 200
-
-'''
-@app.route('/dataOwner/fullrequest/', methods=['POST'])
-def dataowner_fullrequest():
-    """ Request to the SDM Server to send a request of handshake, cipher  the message
-
-        This function is used to send a request to the SDM Server
-        to make an handshake, cipher the message and send it to the MANUFACTURER
-        
-        Args:
-            message: the message to cipher, it's a string read from a json file
-            entries:  a list of list of label of the message that has the same policy
-            policy: a list containing for each group of label the process_id associated
-                and the policy, defining which actors can access the data
-            process_id: the id of the process (process_instance_id)
-            
-        Returns:   
-            The status of the request, 200 if all the operations are completed
-    """
-    message = request.json.get('message')
-    if len(message) == 0:
-        return "Missing parameters" , 400
-    entries = request.json.get('entries')
-    policy = request.json.get('policy')
-    if len(entries) == 0:
-        return "Missing parameters" , 400
-    if len(policy) == 0:
-        return "Missing parameters" , 400
-    
-    #TODO: Check if it is mandatory
-    if len(entries) != len(policy):
-        return "Entries and policy legth doesn't match" , 400   
-
-    entries_string = '###'.join(str(x) for x in entries)
-    policy_string = '###'.join(str(x) for x in policy)
-    message = json.dumps(message)
-    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
-    data_owner.handshake()
-    data_owner = CAKEDataOwner(process_instance_id=request.json.get('process_id'))
-    data_owner.cipher_data(message, entries_string, policy_string)
-    return "Full request completed", 200
-'''
 
 @app.route('/certification/', methods=['POST'])
 def certification():
