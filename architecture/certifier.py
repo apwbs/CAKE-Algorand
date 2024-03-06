@@ -149,7 +149,6 @@ class Certifier():
         dict_users = {}
         for actor, list_roles in roles.items():
             dict_users[config('ADDRESS_' + actor)] = [str(process_instance_id)] + [role for role in list_roles]
-        print(dict_users)
 
         f = io.StringIO()
         dict_users_dumped = json.dumps(dict_users)
